@@ -485,6 +485,31 @@ export default [
     meta: {
       hideInMenu: true
     },
-    component: () => import('@/view/error-page/404.vue')
+    component: () => import('@/view/error-page/404.vue')  
+  },
+  {
+    path: 'rongzai',
+    name: 'rongzai',
+    component: Main,
+    children: [
+      {
+        path: '/rongzai-detail',
+        name: 'rongzai/rongzai-detail',
+        meta: {
+          title: '容灾'
+        },
+        component: () => import('@/view/rongzai-detail/rongzai-detail.vue')
+      },
+      {
+        path: '/ips-change',
+        name: 'rongzai/ips-change',
+        meta: {
+          title: 'IPS免认证切换',
+        },
+        component: () => import('@/view/ips-change/ips-change.vue')
+      }
+    ]
+    
   }
+
 ]

@@ -52,6 +52,7 @@ import './main.less'
 import {
  getMenuList
 } from '@/api/routers'
+import { debug } from 'util';
 export default {
   name: 'Main',
   components: {
@@ -170,6 +171,7 @@ export default {
     }
   },
   created() {
+     console.log(this.$store.getters.menuList)
     let menus = [];
     getMenuList().then(res=>{
       console.log(res.data.data)

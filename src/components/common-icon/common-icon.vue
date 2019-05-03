@@ -10,7 +10,7 @@ export default {
   props: {
     type: {
       type: String,
-      value: '',
+      default: '',
       required: true
     },
     color: String,
