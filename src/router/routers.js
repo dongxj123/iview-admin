@@ -485,7 +485,7 @@ export default [
     meta: {
       hideInMenu: true
     },
-    component: () => import('@/view/error-page/404.vue')  
+    component: () => import('@/view/error-page/404.vue')
   },
   {
     path: 'rongzai',
@@ -504,7 +504,7 @@ export default [
         path: '/ips-change',
         name: 'rongzai/ips-change',
         meta: {
-          title: 'IPS免认证切换',
+          title: 'IPS免认证切换'
         },
         component: () => import('@/view/ips-change/ips-change.vue')
       },
@@ -512,12 +512,12 @@ export default [
         path: '/get-exec-log',
         name: 'rongzai/get-exec-log',
         meta: {
-          title: '执行日志',
+          title: '执行日志'
         },
         component: () => import('@/view/get-exec-log/get-exec-log.vue')
       }
     ]
-    
+
   }
 
 ]
