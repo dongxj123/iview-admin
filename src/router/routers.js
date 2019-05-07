@@ -507,6 +507,14 @@ export default [
           title: 'IPS免认证切换',
         },
         component: () => import('@/view/ips-change/ips-change.vue')
+      },
+      {
+        path: '/get-exec-log',
+        name: 'rongzai/get-exec-log',
+        meta: {
+          title: '执行日志',
+        },
+        component: () => import('@/view/get-exec-log/get-exec-log.vue')
       }
     ]
     

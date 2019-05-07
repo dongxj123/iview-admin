@@ -9,6 +9,7 @@ import {
   restoreTrash,
   getUnreadCount
 } from '@/api/user'
+import Vue from 'vue'
 import { setToken, getToken } from '@/libs/util'
 
 export default {
@@ -86,6 +87,7 @@ export default {
           resolve(data)
         }).catch(err => {
           reject(err)
+          Vue.prototype.$Message.error(err.message)
         })
       })
     },

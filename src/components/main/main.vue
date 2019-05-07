@@ -53,6 +53,7 @@ import {
  getMenuList
 } from '@/api/routers'
 import { debug } from 'util';
+import { setToken, getToken } from '@/libs/util'
 export default {
   name: 'Main',
   components: {
@@ -171,10 +172,11 @@ export default {
     }
   },
   created() {
-     console.log(this.$store.getters.menuList)
     let menus = [];
+    //setToken('3233')
     getMenuList().then(res=>{
-      console.log(res.data.data)
+      
+      console.log(res.data)
       menus = res.data.data;
       menus.forEach((menu,index) => {
         menus[index].meta={'title': menu.name}; 

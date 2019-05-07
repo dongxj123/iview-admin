@@ -19,8 +19,13 @@ export default {
   baseUrl: {
     // dev: 'http://192.168.137.105:8000/',
     // pro: 'http://192.168.137.105:8000/'
-    dev: 'http://localhost:8000/',
-    pro: 'http://localhost:8000/'
+    // dev: 'http://localhost:8000/',
+    // pro: 'http://localhost:8000/'
+    // dev: 'http://192.168.24.13:8888/',
+    // pro: 'http://92.168.24.13:8888/'
+    dev: 'http://211.140.39.212:6000/',
+    pro: 'http://211.140.39.212:6000/'
+   
   },
   /**
    * @description 默认打开的首页的路由name值，默认为home

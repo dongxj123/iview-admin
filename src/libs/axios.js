@@ -1,5 +1,8 @@
 import axios from 'axios'
 import store from '@/store'
+import { setToken, getToken } from '@/libs/util'
+import Vue from 'vue'
+import router from '../router'
 // import { Spin } from 'iview'
 const addErrorLog = errorInfo => {
   const { statusText, status, request: { responseURL } } = errorInfo
@@ -48,6 +51,14 @@ class HttpRequest {
     instance.interceptors.response.use(res => {
       this.destroy(url)
       const { data, status } = res
+      var code=res.data.code;
+      if(code>600){
+        setToken('');
+        router.push({
+          path: '/login'
+        })
+        Vue.prototype.$Message.warning(res.data.message)
+      }
       return { data, status }
     }, error => {
       this.destroy(url)
