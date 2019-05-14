@@ -50,10 +50,10 @@ import minLogo from '@/assets/images/logo-min.jpg'
 import maxLogo from '@/assets/images/logo.jpg'
 import './main.less'
 import {
- getMenuList
+  getMenuList
 } from '@/api/routers'
-import { debug } from 'util';
-import { setToken, getToken } from '@/libs/util'
+// import debug from 'util'
+
 export default {
   name: 'Main',
   components: {
@@ -72,7 +72,7 @@ export default {
       minLogo,
       maxLogo,
       isFullscreen: false,
-      menuList: [],
+      menuList: []
     }
   },
   computed: {
@@ -94,9 +94,9 @@ export default {
     },
     // menuList () {
     //   let menus;
-     
+
     //   console.log(this.$store.getters.menuList)
-     
+
     //   // return this.$store.getters.menuList
     // },
     local () {
@@ -171,20 +171,18 @@ export default {
       this.$refs.sideMenu.updateOpenName(newRoute.name)
     }
   },
-  created() {
-    let menus = [];
-    //setToken('3233')
-    getMenuList().then(res=>{
-      
-      console.log(res.data)
-      menus = res.data.data;
-      menus.forEach((menu,index) => {
-        menus[index].meta={'title': menu.name}; 
-      });
-      this.menuList = menus;
-    }).catch(err=>{
+  created () {
+    let menus = []
+    // setToken('3233')
+    getMenuList().then(res => {
+      menus = res.data.data
+      menus.forEach((menu, index) => {
+        menus[index].meta = { 'title': menu.name }
+      })
+      this.menuList = menus
+    }).catch(err => {
       console.log(err)
-    });
+    })
   },
   mounted () {
     /**
@@ -206,7 +204,7 @@ export default {
       })
     }
     // 获取未读消息条数
-    //this.getUnreadMessageCount()
+    // this.getUnreadMessageCount()
   }
 }
 </script>

@@ -1,5 +1,5 @@
 import axios from '@/libs/api.request'
-import getToken from '@/libs/util'
+import { getToken } from '@/libs/util'
 export const getRouterReq = (access) => {
   return axios.request({
     url: 'get_router',
@@ -30,15 +30,20 @@ export const getScripts = () => {
     method: 'get'
   })
 }
-export const addButton = (btnName, scriptName) => {
-  const data = JSON.stringify({
-    'name': btnName,
-    'script': scriptName,
-    'order_num': 1
-  })
+export const addButton = (addButtonParam) => {
+  const data = JSON.stringify(addButtonParam)
   return axios.request({
     headers: { 'AUTHORIZATION': 'token ' + getToken() },
     url: 'rongzai/add-button/',
+    data,
+    method: 'post'
+  })
+}
+export const editButton = (editButtonParam) => {
+  const data = JSON.stringify(editButtonParam)
+  return axios.request({
+    headers: { 'AUTHORIZATION': 'token ' + getToken() },
+    url: 'rongzai/update-button/',
     data,
     method: 'post'
   })

@@ -1,6 +1,6 @@
 import axios from 'axios'
 import store from '@/store'
-import setToken from '@/libs/util'
+import { setToken } from '@/libs/util'
 import Vue from 'vue'
 import router from '../router'
 // import { Spin } from 'iview'
@@ -49,7 +49,6 @@ class HttpRequest {
     })
     // 响应拦截
     instance.interceptors.response.use(res => {
-      console.log(res)
       this.destroy(url)
       const { data, status } = res
       var code = res.data.code

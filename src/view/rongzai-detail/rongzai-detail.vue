@@ -1,22 +1,37 @@
 <template>
     <div>
-        <Button class="button-distance" @click="confirm(item)" :type="item.order_num==1?'success':'error'" v-for="(item,index) in buttonList" :key="index">{{item.name}}</Button>
-        <Button class="add-btn" type="primary" @click="modal1 = true">添加按钮</Button>
+        <Dropdown @on-click="editButton($event,item)" class="button-distance" trigger="contextMenu" v-for="(item,index) in buttonList" :key="index">
+            <Button :type="item.have_sms_auth==0?'success':'error'" @click="confirm(item)">
+                {{item.name}}
+            </Button>
+            <DropdownMenu slot="list">
+                <DropdownItem name="edit">编辑</DropdownItem>
+            </DropdownMenu>
+        </Dropdown>
+        <!-- <Button class="button-distance" @click="confirm(item)" :type="item.have_sms_auth==0?'success':'error'" v-for="(item,index) in buttonList" :key="index">{{item.name}}</Button> -->
+        <Button class="add-btn" type="primary" @click="openAdd('add')">添加按钮</Button>
         <Modal
         v-model="modal1"
-        title="添加容灾按钮"
+        title="容灾按钮操作"
         >
         <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="90">
-            <FormItem label="按钮名称：" prop="btnName">
-                <Input v-model="formValidate.btnName" placeholder="请输入按钮名称：..."></Input>
+            <FormItem label="按钮名称：" prop="name">
+                <Input v-model="formValidate.name" placeholder="请输入按钮名称：..."></Input>
             </FormItem>
-            <FormItem label="选择脚本：" prop="scriptName">
-                <Select v-model="formValidate.scriptName" placeholder="请选择脚本">
+            <FormItem label="选择脚本：" prop="script">
+                <Select v-model="formValidate.script" placeholder="请选择脚本">
                     <Option v-for="(val,i) in scriptList" :value="val" :key="i">{{ val }}</Option>
                 </Select>
             </FormItem>
+            <FormItem label="验证选项：">
+                <Checkbox v-model="formValidate.have_sms_auth">短信验证</Checkbox>
+                <Checkbox v-model="formValidate.have_password_auth">用户密码验证</Checkbox>
+            </FormItem>
+            <FormItem label="脚本参数：" prop="static_param">
+                <Input v-model="formValidate.static_param" type="textarea" placeholder="请输入脚本参数（非必填）" />
+            </FormItem>
             <FormItem>
-                <Button :disabled="disabled" type="primary" @click="handleSubmit()">添加</Button>
+                <Button :disabled="disabled_add" type="primary" @click="handleSubmit()">{{submitName}}</Button>
                 <Button @click="handleReset()" style="margin-left: 8px">重置</Button>
             </FormItem>
         </Form>
@@ -37,124 +52,258 @@
             <Button type="primary" @click="modal2 = false">确定</Button>
         </div>
     </Modal>
+    <Modal
+        v-model="modal3"
+        title="确认执行脚本？"
+        >
+        <Form ref="formArg" :model="formArg" :rules="ruleformArg" :label-width="90">
+            <FormItem label="按钮名称：" style="margin-bottom:10px;">
+                <span>{{curentBtn.name}}</span>
+            </FormItem>
+            <FormItem label="用户名：" prop="username" v-if="curentBtn.have_password_auth==1">
+                <Input v-model="formArg.username" placeholder="请输入用户名：..."></Input>
+            </FormItem>
+            <FormItem label="密码：" prop="pwd" v-if="curentBtn.have_password_auth==1">
+                <Input v-model="formArg.pwd" placeholder="请输入密码：..."></Input>
+            </FormItem>
+            <FormItem label="验证码：" prop="verifyCode" v-if="curentBtn.have_sms_auth==1">
+                <Input v-model="formArg.verifyCode" placeholder="请输入验证码：..."></Input>
+                <Button type="primary" style="margin-top:10px;" @click="sendMsg" :disabled="disabled_sm">{{name_sm}}</Button>
+            </FormItem>
+
+        </Form>
+        <div slot="footer">
+            <Button type="primary" @click="ok">确定</Button>
+            <Button @click="cancel">取消</Button>
+        </div>
+    </Modal>
     </div>
 </template>
 
 <script>
 import {
-    getMenuList,
-    getrongzaiDetail,
-    getScripts,
-    addButton,
-    executeButton
+  getrongzaiDetail,
+  getScripts,
+  addButton,
+  //   executeButton,
+  editButton
 } from '@/api/routers'
-import { setToken, getToken } from '@/libs/util'
-    export default {
-        data(){
-            return{
-                formValidate: {
-                    btnName: '',
-                    scriptName: ''
-                },
-                disabled:false,
-                buttonList:[],
-                modal1: false,
-                modal2: false,
-                scriptList: [],
-                ruleValidate: {
-                    btnName: [
-                        { required: true, message: '按钮名称不能为空', trigger: 'blur' }
-                    ],
-                    scriptName: [
-                        { required: true, message: '请选择脚本', trigger: 'change' }
-                    ]
-                },
-                executeResult:{}
-            }
-        },
-        methods:{
-            handleSubmit () {
-                this.$refs['formValidate'].validate((valid) => {
-                    if (valid) {
-                        this.disabled=true;
-                        addButton(this.formValidate.btnName,this.formValidate.scriptName).then(res=>{
-                            if(res.data.code===0){
-                                this.$Message.success(res.data.message)
-                            }
-                            this.disabled=false;
-                            this.reload();
-                            this.modal1=false;
-                        }).catch(err=>{
-                            console.log(err);
-                            this.$Message.error(err.message)
-                        });
-                    } else {
-                        //this.$Message.error('Fail!');
-                    }
-                })
-            },
-            handleReset () {
-                this.$refs['formValidate'].resetFields();
-                this.disabled=false;
-            },
-            reload(){
-                let buttons = [];
-                getrongzaiDetail().then(res=>{
-                    buttons = res.data.data;
-                    this.buttonList = buttons;
-                }).catch(err=>{
-                    this.$Message.error(err.message)
-                });
-            },
-            confirm (btnMsg) {
-                this.$Modal.confirm({
-                    title: '确认执行脚本？',
-                    content: `<p>${btnMsg.script}</p>`,
-                    onOk: () => {
-                        //let executeResult={};
-                        executeButton(btnMsg.id).then(res=>{
-                            // if(res.data.code===0){
-                            //     this.$Message.success(res.data.message);
-                            // }
-                            this.executeResult=res.data.data;
-                            this.$Message.success(res.data.message);
-                            this.modal2=true;
-                        }).catch(err=>{
-                            this.$Message.error(err.message)
-                        });
-                    },
-                    onCancel: () => {
-                        //this.$Message.info('Clicked cancel');
-                    }
-                });
-            }
-        },
-        created() {
-            let buttons = [];
-            getrongzaiDetail().then(res=>{
-                buttons = res.data.data;
-                this.buttonList = buttons;
-            }).catch(err=>{
-                this.$Message.error(err.message)
-            });
-        },
-        watch:{
-            modal1(newVal){
-                if(newVal){
-                    this.formValidate.btnName='';
-                    this.formValidate.scriptName='';
-                    let scripts=[];
-                    getScripts().then(res=>{
-                        scripts=res.data.data;
-                        this.scriptList=scripts;
-                    }).catch(err=>{
-                        console.log(err)
-                        this.$Message.error(err.message)
-                    });
-                }
-            }
-        }
+// import { setToken, getToken } from '@/libs/util'
+export default {
+  data () {
+    return {
+      operateType: '',
+      editID: '',
+      submitName: '',
+      formValidate: {
+        name: '',
+        script: '',
+        static_param: '',
+        have_password_auth: false,
+        have_sms_auth: false
+      },
+      name_sm: '发送验证码',
+      disabled_sm: false,
+      formArg: {
+        username: '',
+        pwd: '',
+        verifyCode: ''
+      },
+      disabled_add: false,
+      buttonList: [],
+      curentBtn: {},
+      modal1: false,
+      modal2: false,
+      modal3: false,
+      scriptList: [],
+      ruleValidate: {
+        name: [
+          { required: true, message: '按钮名称不能为空', trigger: 'blur' }
+        ],
+        script: [
+          { required: true, message: '请选择脚本', trigger: 'change' }
+        ]
+      },
+      ruleformArg: {
+        username: [
+          { required: true, message: '用户名不能为空', trigger: 'blur' }
+        ],
+        pwd: [
+          { required: true, message: '密码不能为空', trigger: 'blur' }
+        ],
+        verifyCode: [
+          { required: true, message: '验证码不能为空', trigger: 'blur' }
+        ]
+      },
+      executeResult: {}
     }
+  },
+  methods: {
+    openAdd (fun) {
+      this.operateType = 'add'
+      // 执行handleSubmit时判断是添加还是编辑
+      if (fun === 'add') {
+        this.formValidate.have_password_auth = false
+        this.formValidate.have_sms_auth = false
+        this.submitName = '添加'
+        this.modal1 = true
+      }
+    },
+    editButton (event, item) {
+      this.operateType = 'edit'
+      this.submitName = '确认编辑'
+      this.formValidate = {
+        name: item.name,
+        script: item.script,
+        static_param: item.static_param,
+        have_password_auth: !!item.have_password_auth,
+        have_sms_auth: !!item.have_sms_auth
+      }
+      // this.have_password_auth=item.have_password_auth?true:false;
+      // this.have_sms_auth=item.have_sms_auth?true:false;
+      this.editID = item.id
+      this.$Message.info('您正在编辑...')
+      this.modal1 = true
+    },
+    ok () {
+      if (!this.curentBtn.have_password_auth && !this.curentBtn.have_sms_auth) {
+        this.modal3 = false
+        this.$Message.info('Clicked ok')
+      } else {
+        this.$refs['formArg'].validate((valid) => {
+          console.log(this.formArg)
+          if (valid) {
+            this.modal3 = false
+            this.$refs['formArg'].resetFields()
+          } else {
+            this.$Message.error('请填写完整！')
+          }
+        })
+        this.$Message.info('Clicked ok')
+      }
+    },
+    cancel () {
+      this.$refs['formArg'].resetFields()
+      this.modal3 = false
+    },
+    handleSubmit () {
+      this.$refs['formValidate'].validate((valid) => {
+        if (valid) {
+          if (this.operateType === 'add') {
+            this.disabled_add = true
+            var addButtonParam = this.formValidate
+            addButtonParam.have_password_auth = this.formValidate.have_password_auth ? 1 : 0
+            addButtonParam.have_sms_auth = this.formValidate.have_sms_auth ? 1 : 0
+            addButtonParam.order_num = 1
+            addButton(addButtonParam).then(res => {
+              if (res.data.code === 0) {
+                this.$Message.success(res.data.message)
+              }
+              this.disabled_add = false
+              this.reload()
+              this.modal1 = false
+            }).catch(err => {
+              console.log(err)
+              this.$Message.error(err.message)
+            })
+          } else {
+            debugger
+            this.disabled_add = true
+            var editButtonParam = this.formValidate
+            editButtonParam.have_password_auth = this.formValidate.have_password_auth ? 1 : 0
+            editButtonParam.have_sms_auth = this.formValidate.have_sms_auth ? 1 : 0
+            editButtonParam.order_num = 2
+            editButtonParam.id = this.editID
+            editButton(editButtonParam).then(res => {
+              if (res.data.code === 0) {
+                this.$Message.success('修改成功')
+              }
+              this.disabled_add = false
+              this.reload()
+              this.modal1 = false
+            }).catch(err => {
+              console.log(err)
+              this.$Message.error(err.message)
+            })
+          }
+        } else {
+          // this.$Message.error('Fail!');
+        }
+      })
+    },
+    handleReset () {
+      this.$refs['formValidate'].resetFields()
+      this.disabled_add = false
+    },
+    reload () {
+      let buttons = []
+      getrongzaiDetail().then(res => {
+        buttons = res.data.data
+        this.buttonList = buttons
+      }).catch(err => {
+        this.$Message.error(err.message)
+      })
+    },
+    confirm (btnMsg) {
+      this.curentBtn = btnMsg
+      this.modal3 = true
+      // this.$Modal.confirm({
+      //     title: '确认执行脚本？',
+      //     content: `<p>${btnMsg.script}</p>`,
+      //     onOk: () => {
+      //         //let executeResult={};
+      //         executeButton(btnMsg.id).then(res=>{
+      //             // if(res.data.code===0){
+      //             //     this.$Message.success(res.data.message);
+      //             // }
+      //             this.executeResult=res.data.data;
+      //             this.$Message.success(res.data.message);
+      //             this.modal2=true;
+      //         }).catch(err=>{
+      //             this.$Message.error(err.message)
+      //         });
+      //     },
+      //     onCancel: () => {
+      //         //this.$Message.info('Clicked cancel');
+      //     }
+      // });
+    },
+    sendMsg () {
+      this.disabled_sm = true
+      this.name_sm = '再次发送（60）'
+    }
+  },
+  created () {
+    let buttons = []
+    getrongzaiDetail().then(res => {
+      buttons = res.data.data
+      this.buttonList = buttons
+    }).catch(err => {
+      this.$Message.error(err.message)
+    })
+  },
+  watch: {
+    modal1 (newVal) {
+      if (newVal) {
+        // 清空表单
+        this.$refs['formValidate'].resetFields()
+        let scripts = []
+        getScripts().then(res => {
+          scripts = res.data.data
+          this.scriptList = scripts
+        }).catch(err => {
+          console.log(err)
+          this.$Message.error(err.message)
+        })
+      }
+    },
+    modal3 (newVal) {
+      if (newVal) {
+        this.$refs['formArg'].resetFields()
+      }
+    }
+  }
+}
 </script>
 
 <style lang="less" scoped>
