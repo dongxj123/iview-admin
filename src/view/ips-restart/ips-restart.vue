@@ -1,9 +1,10 @@
 <template>
     <div>
-        <Table :loading="loading" border ref="selection" :columns="columns4" :data="data1" @on-selection-change="onSelectionChange"></Table>
-        <Button @click="handleSelectAll(true)" style="margin-top:9px;">全选</Button>
-        <Button @click="handleSelectAll(false)" style="margin-left:9px;margin-top:9px;">取消全选</Button>
-        <Button type="info" @click="confirm" style="margin-left:9px;margin-top:9px;">切换</Button>
+        <Table :loading="loading" border :columns="columns4" :data="data1">
+            <template slot-scope="{ row, index }" slot="action">
+                <Button type="primary" size="small" style="margin-right: 5px" @click="confirm(index)">重启</Button>
+            </template>
+        </Table>
         <Modal
         v-model="modal1"
         title="请输入用户名密码"
@@ -78,40 +79,29 @@ export default {
           align: 'center'
         },
         {
-          type: 'selection',
-          width: 60,
+          title: '操作',
+          slot: 'action',
+          width: 150,
           align: 'center'
         }
       ],
       data1: [],
-      selectedIP: []
+      restartIP: ''
     }
   },
   methods: {
-    handleSelectAll (status) {
-      this.$refs.selection.selectAll(status)
-    },
-    onSelectionChange (selection) {
-      this.selectedIP = []
-      for (var i in selection) {
-        this.selectedIP.push(selection[i].ip)
-      }
-    },
-    confirm () {
-      if (this.selectedIP.length) {
-        this.modal1 = true
-      } else {
-        this.$Message.warning('请先选择切换项')
-      }
+    confirm (index) {
+      this.restartIP = this.data1[index].ip
+      this.modal1 = true
     },
     ok () {
       this.$refs['formArg'].validate((valid) => {
         if (valid) {
           var operateServerParam = {
-            'selected_servers': this.selectedIP,
+            'selected_servers': new Array(this.restartIP),
             'username': this.formArg.username,
             'password': this.formArg.pwd,
-            'operate_type': 1
+            'operate_type': 2
           }
           operateServer(operateServerParam).then(res => {
             if (res.data.code === 0) {

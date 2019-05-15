@@ -515,6 +515,38 @@ export default [
           title: '执行日志'
         },
         component: () => import('@/view/get-exec-log/get-exec-log.vue')
+      },
+      {
+        path: '/urgent-ips-change',
+        name: 'rongzai/urgent-ips-change',
+        meta: {
+          title: '应急IPS免认证切换'
+        },
+        component: () => import('@/view/urgent-ips-change/urgent-ips-change')
+      },
+      {
+        path: '/ips-restart',
+        name: 'rongzai/ips-restart',
+        meta: {
+          title: 'IPS重启'
+        },
+        component: () => import('@/view/ips-restart/ips-restart')
+      },
+      {
+        path: '/utc-restart',
+        name: 'rongzai/utc-restart',
+        meta: {
+          title: 'UTC重启'
+        },
+        component: () => import('@/view/utc-restart/utc-restart')
+      },
+      {
+        path: '/zhaozhou',
+        name: 'rongzai/zhaozhou',
+        meta: {
+          title: 'zhaozhou'
+        },
+        component: () => import('@/view/zhaozhou/zhaozhou')
       }
     ]
 

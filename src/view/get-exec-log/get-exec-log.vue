@@ -17,6 +17,10 @@ export default {
       current: 1,
       columns1: [
         {
+          title: '操作人',
+          key: 'operator'
+        },
+        {
           title: '脚本执行结束时间',
           key: 'exec_date'
         },
@@ -29,8 +33,8 @@ export default {
           key: 'start_date'
         },
         {
-          title: '标准错误',
-          key: 'stderr'
+          title: '服务器用户名',
+          key: 'username'
         },
         {
           title: '脚本执行返回码',

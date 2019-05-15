@@ -48,6 +48,9 @@
         <p>脚本执行返回码：{{executeResult.exec_code}}</p>
         <p>脚本执行参数：{{executeResult.options}}</p>
         <p>标准输出：{{executeResult.stdout}}</p>
+        <p>操作用户：{{executeResult.operator}}</p>
+        <p>参数用户：{{executeResult.username}}</p>
+        <!-- <p>参数密码：******</p> -->
         <div slot="footer">
             <Button type="primary" @click="modal2 = false">确定</Button>
         </div>
@@ -85,7 +88,7 @@ import {
   getrongzaiDetail,
   getScripts,
   addButton,
-  //   executeButton,
+  executeButton,
   editButton
 } from '@/api/routers'
 // import { setToken, getToken } from '@/libs/util'
@@ -167,19 +170,49 @@ export default {
     },
     ok () {
       if (!this.curentBtn.have_password_auth && !this.curentBtn.have_sms_auth) {
-        this.modal3 = false
-        this.$Message.info('Clicked ok')
+        var executeButtonParam = {
+          'button_id': this.curentBtn.id,
+          'username': this.formArg.username,
+          'password': this.formArg.pwd,
+          'sms_key': '1234',
+          'sms_code': '5678'
+        }
+        executeButton(executeButtonParam).then(res => {
+          if (res.data.code === 0) {
+            this.$Message.success(res.data.message)
+          }
+          this.executeResult = res.data.data
+          this.modal2 = true
+          this.modal3 = false
+          // this.$refs['formArg'].resetFields()
+        }).catch(err => {
+          this.$Message.error(err.message)
+        })
       } else {
         this.$refs['formArg'].validate((valid) => {
-          console.log(this.formArg)
           if (valid) {
-            this.modal3 = false
-            this.$refs['formArg'].resetFields()
+            var executeButtonParam = {
+              'button_id': this.curentBtn.id,
+              'username': this.formArg.username,
+              'password': this.formArg.pwd,
+              'sms_key': '1234',
+              'sms_code': '5678'
+            }
+            executeButton(executeButtonParam).then(res => {
+              if (res.data.code === 0) {
+                this.$Message.success(res.data.message)
+              }
+              this.executeResult = res.data.data
+              this.modal2 = true
+              this.modal3 = false
+              // this.$refs['formArg'].resetFields()
+            }).catch(err => {
+              this.$Message.error(err.message)
+            })
           } else {
             this.$Message.error('请填写完整！')
           }
         })
-        this.$Message.info('Clicked ok')
       }
     },
     cancel () {
@@ -207,11 +240,10 @@ export default {
               this.$Message.error(err.message)
             })
           } else {
-            debugger
             this.disabled_add = true
-            var editButtonParam = this.formValidate
-            editButtonParam.have_password_auth = this.formValidate.have_password_auth ? 1 : 0
-            editButtonParam.have_sms_auth = this.formValidate.have_sms_auth ? 1 : 0
+            var editButtonParam = Object.assign({}, this.formValidate)
+            editButtonParam.have_password_auth = editButtonParam.have_password_auth ? 1 : 0
+            editButtonParam.have_sms_auth = editButtonParam.have_sms_auth ? 1 : 0
             editButtonParam.order_num = 2
             editButtonParam.id = this.editID
             editButton(editButtonParam).then(res => {

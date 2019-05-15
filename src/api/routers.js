@@ -48,10 +48,8 @@ export const editButton = (editButtonParam) => {
     method: 'post'
   })
 }
-export const executeButton = (id) => {
-  const data = JSON.stringify({
-    'button_id': id
-  })
+export const executeButton = (executeButtonParam) => {
+  const data = JSON.stringify(executeButtonParam)
   return axios.request({
     headers: { 'AUTHORIZATION': 'token ' + getToken() },
     url: 'rongzai/execute-button/',
@@ -67,6 +65,24 @@ export const getExecLog = (page, pageSize) => {
   return axios.request({
     headers: { 'AUTHORIZATION': 'token ' + getToken() },
     url: 'rongzai/get-exec-log/',
+    data,
+    method: 'post'
+  })
+}
+
+export const getServerList = () => {
+  return axios.request({
+    headers: { 'AUTHORIZATION': 'token ' + getToken() },
+    url: 'rongzai/server-list/',
+    method: 'get'
+  })
+}
+
+export const operateServer = (operateServerParam) => {
+  const data = JSON.stringify(operateServerParam)
+  return axios.request({
+    headers: { 'AUTHORIZATION': 'token ' + getToken() },
+    url: 'rongzai/operate-server/',
     data,
     method: 'post'
   })
