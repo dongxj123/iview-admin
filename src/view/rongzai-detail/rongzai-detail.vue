@@ -71,7 +71,7 @@
             </FormItem>
             <FormItem label="验证码：" prop="verifyCode" v-if="curentBtn.have_sms_auth==1">
                 <Input v-model="formArg.verifyCode" placeholder="请输入验证码：..."></Input>
-                <Button type="primary" style="margin-top:10px;" @click="sendMsg" :disabled="disabled_sm">{{name_sm}}</Button>
+                <!-- <Button type="primary" style="margin-top:10px;" @click="sendMsg" :disabled="disabled_sm">{{name_sm}}</Button> -->
             </FormItem>
 
         </Form>
@@ -279,26 +279,6 @@ export default {
     confirm (btnMsg) {
       this.curentBtn = btnMsg
       this.modal3 = true
-      // this.$Modal.confirm({
-      //     title: '确认执行脚本？',
-      //     content: `<p>${btnMsg.script}</p>`,
-      //     onOk: () => {
-      //         //let executeResult={};
-      //         executeButton(btnMsg.id).then(res=>{
-      //             // if(res.data.code===0){
-      //             //     this.$Message.success(res.data.message);
-      //             // }
-      //             this.executeResult=res.data.data;
-      //             this.$Message.success(res.data.message);
-      //             this.modal2=true;
-      //         }).catch(err=>{
-      //             this.$Message.error(err.message)
-      //         });
-      //     },
-      //     onCancel: () => {
-      //         //this.$Message.info('Clicked cancel');
-      //     }
-      // });
     },
     sendMsg () {
       this.disabled_sm = true
