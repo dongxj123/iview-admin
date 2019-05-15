@@ -5,7 +5,7 @@
 <template>
   <div class="login">
     <div class="login-con">
-      <Card icon="log-in" title="欢迎登录" :bordered="false">
+      <Card icon="log-in" title="欢迎登录浙江华数容灾平台" :bordered="false">
         <div class="form-con">
           <login-form @on-success-valid="handleSubmit"></login-form>
           <p class="login-tip">请输入用户名和密码</p>
@@ -18,7 +18,7 @@
 <script>
 import LoginForm from '_c/login-form'
 import { mapActions } from 'vuex'
-import { constants } from 'crypto';
+// import { constants } from 'crypto'
 export default {
   components: {
     LoginForm
@@ -30,16 +30,15 @@ export default {
     ]),
     handleSubmit ({ userName, password }) {
       this.handleLogin({ userName, password }).then(res => {
-        if(res.code===0){
-          //this.getUserInfo().then(res => {  
+        if (res.code === 0) {
+          // this.getUserInfo().then(res => {
           this.$router.push({
             name: this.$config.homeName
           })
-          //})
-        }else{
-          this.$Message.error(res.message);
+          // })
+        } else {
+          this.$Message.error(res.message)
         }
-        
       })
     }
   }

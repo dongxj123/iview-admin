@@ -1,6 +1,6 @@
 import {
   login,
-  logout,
+  // logout,
   getUserInfo,
   getMessage,
   getContentByMsgId,
@@ -10,7 +10,7 @@ import {
   getUnreadCount
 } from '@/api/user'
 import Vue from 'vue'
-import { setToken, getToken } from '@/libs/util'
+import { setToken, getToken, setUserName } from '@/libs/util'
 
 export default {
   state: {
@@ -84,6 +84,7 @@ export default {
         }).then(res => {
           const data = res.data
           commit('setToken', data.data.token)
+          setUserName(data.data.username)
           resolve(data)
         }).catch(err => {
           reject(err)
