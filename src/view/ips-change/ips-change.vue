@@ -23,7 +23,7 @@
     </Modal>
     <Modal
         v-model="modal2"
-        title="切换完成"
+        title="完成"
         >
         <p>脚本名称：{{operateResult.script_name}}</p>
         <p>脚本执行开始时间：{{operateResult.start_date}}</p>
@@ -50,6 +50,7 @@ import {
 export default {
   data () {
     return {
+      menuData: {},
       formArg: {
         username: '',
         pwd: ''
@@ -101,7 +102,7 @@ export default {
       if (this.selectedIP.length) {
         this.modal1 = true
       } else {
-        this.$Message.warning('请先选择切换项')
+        this.$Message.warning('请先选择操作项')
       }
     },
     ok () {
@@ -129,19 +130,24 @@ export default {
     cancel () {
       this.$refs['formArg'].resetFields()
       this.modal1 = false
+    },
+    loadTable () {
+      this.loading = true
+      getServerList().then(res => {
+        this.loading = false
+        this.data1 = res.data.data
+        for (var i in this.data1) {
+          this.data1[i].status = this.data1[i].status === 1 ? '认证' : '非认证'
+        }
+      }).catch(err => {
+        this.$Message.error(err.message)
+      })
     }
   },
   created () {
-    this.loading = true
-    getServerList().then(res => {
-      this.loading = false
-      this.data1 = res.data.data
-      for (var i in this.data1) {
-        this.data1[i].status = this.data1[i].status === 1 ? '认证' : '非认证'
-      }
-    }).catch(err => {
-      this.$Message.error(err.message)
-    })
+    let id = this.$route.query.id
+    this.menuData = this.$store.state.menuList[id]
+    this.loadTable()
   },
   watch: {
     modal1 (newVal) {

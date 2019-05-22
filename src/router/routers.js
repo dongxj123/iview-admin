@@ -493,6 +493,14 @@ export default [
     component: Main,
     children: [
       {
+        path: '/menuManager',
+        name: 'menuManager',
+        meta: {
+          title: '菜单管理'
+        },
+        component: () => import('@/view/menuManager/menuManager.vue')
+      },
+      {
         path: '/rongzai-detail',
         name: 'rongzai/rongzai-detail',
         meta: {

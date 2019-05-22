@@ -87,3 +87,46 @@ export const operateServer = (operateServerParam) => {
     method: 'post'
   })
 }
+
+export const addMenu = (addMenuParam) => {
+  const data = JSON.stringify(addMenuParam)
+  return axios.request({
+    headers: { 'AUTHORIZATION': 'token ' + getToken() },
+    url: 'rongzai/add-menu/',
+    data,
+    method: 'post'
+  })
+}
+
+export const editMenu = (editMenuParam) => {
+  const data = JSON.stringify(editMenuParam)
+  return axios.request({
+    headers: { 'AUTHORIZATION': 'token ' + getToken() },
+    url: 'rongzai/update-menu/',
+    data,
+    method: 'post'
+  })
+}
+// 删除菜单
+export const removeMenu = (id) => {
+  const data = JSON.stringify({
+    'id': id
+  })
+  return axios.request({
+    headers: { 'AUTHORIZATION': 'token ' + getToken() },
+    url: 'rongzai/remove-menu/',
+    data,
+    method: 'post'
+  })
+}
+export const getDataByMenu = (id) => {
+  const data = JSON.stringify({
+    'id': id
+  })
+  return axios.request({
+    headers: { 'AUTHORIZATION': 'token ' + getToken() },
+    url: 'rongzai/get-data-by-menu/',
+    data,
+    method: 'post'
+  })
+}

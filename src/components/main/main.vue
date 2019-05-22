@@ -1,11 +1,12 @@
 <template>
   <Layout style="height: 100%" class="main">
     <Sider hide-trigger collapsible :width="256" :collapsed-width="64" v-model="collapsed" class="left-sider" :style="{overflow: 'hidden'}">
-      <side-menu accordion ref="sideMenu" :active-name="$route.name" :collapsed="collapsed" @on-select="turnToPage" :menu-list="menuList">
+      <side-menu accordion ref="sideMenu" :active-name="$route.name" :collapsed="collapsed" @on-select="leftTurnToPage" :menu-list="menuList">
         <!-- 需要放在菜单上面的内容，如Logo，写在side-menu标签内部，如下 -->
         <div class="logo-con">
           <!-- <img v-show="!collapsed" :src="maxLogo" key="max-logo" />
           <img v-show="collapsed" :src="minLogo" key="min-logo" /> -->
+
         </div>
       </side-menu>
     </Sider>
@@ -49,9 +50,9 @@ import routers from '@/router/routers'
 import minLogo from '@/assets/images/logo-min.jpg'
 import maxLogo from '@/assets/images/logo.jpg'
 import './main.less'
-import {
-  getMenuList
-} from '@/api/routers'
+// import {
+//   getMenuList
+// } from '@/api/routers'
 // import debug from 'util'
 
 export default {
@@ -72,7 +73,8 @@ export default {
       minLogo,
       maxLogo,
       isFullscreen: false,
-      menuList: []
+      // menuList: [],
+      menuListIndex: 1
     }
   },
   computed: {
@@ -107,6 +109,9 @@ export default {
     },
     unreadCount () {
       return this.$store.state.user.unreadCount
+    },
+    menuList () {
+      return this.$store.state.menuList
     }
   },
   methods: {
@@ -140,6 +145,13 @@ export default {
         query
       })
     },
+    leftTurnToPage (menuListIndex) {
+      this.menuListIndex = menuListIndex
+      this.$router.push({
+        name: this.menuList[menuListIndex].url,
+        query: { id: this.menuList[menuListIndex].id }
+      })
+    },
     handleCollapsedChange (state) {
       this.collapsed = state
     },
@@ -158,6 +170,17 @@ export default {
     handleClick (item) {
       this.turnToPage(item)
     }
+    // loadMenuList(){
+    // getMenuList().then(res => {
+    //   let menus = res.data.data
+    //   menus.forEach((menu, index) => {
+    //     menus[index].meta = { 'title': menu.name }
+    //   })
+    //   this.menuList = menus
+    // }).catch(err => {
+    //   console.log(err)
+    // })
+    // }
   },
   watch: {
     '$route' (newRoute) {
@@ -172,17 +195,17 @@ export default {
     }
   },
   created () {
-    let menus = []
-    // setToken('3233')
-    getMenuList().then(res => {
-      menus = res.data.data
-      menus.forEach((menu, index) => {
-        menus[index].meta = { 'title': menu.name }
-      })
-      this.menuList = menus
-    }).catch(err => {
-      console.log(err)
-    })
+    this.$store.dispatch('updateSideMenuList')
+  },
+  beforeRouteUpdate (to, from, next) {
+    if (to.name !== 'menuManager') {
+      to.meta.title = this.menuList[this.menuListIndex].name
+    }
+    next()
+    // 在当前路由改变，但是该组件被复用时调用
+    // 举例来说，对于一个带有动态参数的路径 /foo/:id，在 /foo/1 和 /foo/2 之间跳转的时候，
+    // 由于会渲染同样的 Foo 组件，因此组件实例会被复用。而这个钩子就会在这个情况下被调用。
+    // 可以访问组件实例 `this`
   },
   mounted () {
     /**

@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import routes from './routers'
 import store from '@/store'
 import iView from 'iview'
-import { setToken, getToken, canTurnTo, setTitle } from '@/libs/util'
+import { getToken, setTitle } from '@/libs/util'
 import config from '@/config'
 const { homeName } = config
 
@@ -37,7 +37,6 @@ router.beforeEach((to, from, next) => {
       name: homeName // 跳转到homeName页
     })
   } else {
-    console.log(store.state.user.access)
     if (store.state.user.hasGetInfo) {
       turnTo(to, store.state.user.access, next)
     } else {

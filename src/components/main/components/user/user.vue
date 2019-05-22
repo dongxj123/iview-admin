@@ -8,6 +8,10 @@
           消息中心<Badge style="margin-left: 10px" :count="messageUnreadCount"></Badge>
         </DropdownItem> -->
         <DropdownItem>当前用户：{{username}}</DropdownItem>
+        <DropdownItem name="menuManager">
+            <!-- <Icon type="md-settings"></Icon> -->
+            菜单管理
+        </DropdownItem>
         <DropdownItem name="logout">退出登录</DropdownItem>
       </DropdownMenu>
     </Dropdown>
@@ -51,11 +55,16 @@ export default {
         name: 'message_page'
       })
     },
+    menuManager () {
+      this.$router.push({ path: '/menuManager' })
+    },
     handleClick (name) {
       switch (name) {
         case 'logout': this.logout()
           break
         case 'message': this.message()
+          break
+        case 'menuManager':this.menuManager()
           break
       }
     }

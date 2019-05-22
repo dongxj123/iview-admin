@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import { showTitle, routeEqual } from '@/libs/util'
+import { routeEqual, showTagsTitle } from '@/libs/util'
 import beforeClose from '@/router/before-close'
 export default {
   name: 'TagsNav',
@@ -139,7 +139,8 @@ export default {
       this.$emit('input', item)
     },
     showTitleInside (item) {
-      return showTitle(item, this)
+      return showTagsTitle(item, this)
+      // return showTitle(item, this)
     },
     isCurrentTag (item) {
       return routeEqual(this.currentRouteObj, item)

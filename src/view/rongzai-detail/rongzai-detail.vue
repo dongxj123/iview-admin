@@ -30,6 +30,9 @@
             <FormItem label="脚本参数：" prop="static_param">
                 <Input v-model="formValidate.static_param" type="textarea" placeholder="请输入脚本参数（非必填）" />
             </FormItem>
+            <FormItem label="按钮排序：" prop="order_num">
+                <Input  type="number" v-model="formValidate.order_num" placeholder="请输入按钮排序" />
+            </FormItem>
             <FormItem>
                 <Button :disabled="disabled_add" type="primary" @click="handleSubmit()">{{submitName}}</Button>
                 <Button @click="handleReset()" style="margin-left: 8px">重置</Button>
@@ -71,7 +74,7 @@
             </FormItem>
             <FormItem label="验证码：" prop="verifyCode" v-if="curentBtn.have_sms_auth==1">
                 <Input v-model="formArg.verifyCode" placeholder="请输入验证码：..."></Input>
-                <!-- <Button type="primary" style="margin-top:10px;" @click="sendMsg" :disabled="disabled_sm">{{name_sm}}</Button> -->
+                <Button type="primary" style="margin-top:10px;" @click="sendMsg" :disabled="disabled_sm">{{name_sm}}</Button>
             </FormItem>
 
         </Form>
@@ -103,7 +106,8 @@ export default {
         script: '',
         static_param: '',
         have_password_auth: false,
-        have_sms_auth: false
+        have_sms_auth: false,
+        order_num: ''
       },
       name_sm: '发送验证码',
       disabled_sm: false,
@@ -125,6 +129,9 @@ export default {
         ],
         script: [
           { required: true, message: '请选择脚本', trigger: 'change' }
+        ],
+        order_num: [
+          { required: true, message: '按钮排序不能为空' }
         ]
       },
       ruleformArg: {
@@ -160,7 +167,8 @@ export default {
         script: item.script,
         static_param: item.static_param,
         have_password_auth: !!item.have_password_auth,
-        have_sms_auth: !!item.have_sms_auth
+        have_sms_auth: !!item.have_sms_auth,
+        order_num: item.order_num
       }
       // this.have_password_auth=item.have_password_auth?true:false;
       // this.have_sms_auth=item.have_sms_auth?true:false;
@@ -227,7 +235,6 @@ export default {
             var addButtonParam = this.formValidate
             addButtonParam.have_password_auth = this.formValidate.have_password_auth ? 1 : 0
             addButtonParam.have_sms_auth = this.formValidate.have_sms_auth ? 1 : 0
-            addButtonParam.order_num = 1
             addButton(addButtonParam).then(res => {
               if (res.data.code === 0) {
                 this.$Message.success(res.data.message)
@@ -244,7 +251,6 @@ export default {
             var editButtonParam = Object.assign({}, this.formValidate)
             editButtonParam.have_password_auth = editButtonParam.have_password_auth ? 1 : 0
             editButtonParam.have_sms_auth = editButtonParam.have_sms_auth ? 1 : 0
-            editButtonParam.order_num = 2
             editButtonParam.id = this.editID
             editButton(editButtonParam).then(res => {
               if (res.data.code === 0) {
@@ -281,8 +287,12 @@ export default {
       this.modal3 = true
     },
     sendMsg () {
-      this.disabled_sm = true
-      this.name_sm = '再次发送（60）'
+      // this.$router.push({
+      //   name:'rongzai/rongzai-detail',
+      //   query:{save:1}
+      // })
+      // this.disabled_sm = true
+      // this.name_sm = '再次发送（60）'
     }
   },
   created () {

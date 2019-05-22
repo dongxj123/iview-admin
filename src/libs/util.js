@@ -6,6 +6,7 @@ const { title, cookieExpires, useI18n } = config
 
 export const TOKEN_KEY = 'token'
 export const USERNAME_KEY = 'username'
+export const MENU_KEY = 'menu'
 
 export const setUserName = (username) => {
   Cookies.set(USERNAME_KEY, username, { expires: cookieExpires || 1 })
@@ -24,7 +25,15 @@ export const getUserName = () => {
   if (username) return username
   else return false
 }
+export const setMenu = (menu) => {
+  Cookies.set(MENU_KEY, menu, { expires: cookieExpires || 1 })
+}
 
+export const getMenu = () => {
+  const menu = Cookies.get(MENU_KEY)
+  if (menu) return menu
+  else return false
+}
 export const hasChild = (item) => {
   return item.children && item.children.length !== 0
 }
@@ -112,7 +121,16 @@ export const showTitle = (item, vm) => {
   } else title = (item.meta && item.meta.title) || item.name
   return title
 }
-
+export const showTagsTitle = (item, vm) => {
+  let { title, __titleIsFunction__ } = item.meta
+  if (!title) return
+  if (useI18n) {
+    if (title.includes('{{') && title.includes('}}') && useI18n) title = title.replace(/({{[\s\S]+?}})/, (m, str) => str.replace(/{{([\s\S]*)}}/, (m, _) => vm.$t(_.trim())))
+    else if (__titleIsFunction__) title = item.meta.title
+    else title = vm.$t(item.name)
+  } else title = (item.meta && item.meta.title) || item.name
+  return title
+}
 /**
  * @description 本地存储和获取标签导航列表
  */
