@@ -72,9 +72,9 @@ export default {
       collapsed: false,
       minLogo,
       maxLogo,
-      isFullscreen: false,
+      isFullscreen: false
       // menuList: [],
-      menuListIndex: 1
+      // menuListIndex: 1
     }
   },
   computed: {
@@ -146,7 +146,7 @@ export default {
       })
     },
     leftTurnToPage (menuListIndex) {
-      this.menuListIndex = menuListIndex
+      // this.menuListIndex = menuListIndex
       this.$router.push({
         name: this.menuList[menuListIndex].url,
         query: { id: this.menuList[menuListIndex].id }
@@ -184,6 +184,11 @@ export default {
   },
   watch: {
     '$route' (newRoute) {
+      let id = parseInt(newRoute.query.id)
+      debugger
+      for (var i in this.menuList) {
+        if (this.menuList[i].id === id) newRoute.meta.title = this.menuList[i].name
+      }
       const { name, query, params, meta } = newRoute
       this.addTag({
         route: { name, query, params, meta },
@@ -197,16 +202,16 @@ export default {
   created () {
     this.$store.dispatch('updateSideMenuList')
   },
-  beforeRouteUpdate (to, from, next) {
-    if (to.name !== 'menuManager') {
-      to.meta.title = this.menuList[this.menuListIndex].name
-    }
-    next()
-    // 在当前路由改变，但是该组件被复用时调用
-    // 举例来说，对于一个带有动态参数的路径 /foo/:id，在 /foo/1 和 /foo/2 之间跳转的时候，
-    // 由于会渲染同样的 Foo 组件，因此组件实例会被复用。而这个钩子就会在这个情况下被调用。
-    // 可以访问组件实例 `this`
-  },
+  // beforeRouteUpdate (to, from, next) {
+  //   if (to.name !== 'menuManager') {
+  //     to.meta.title = this.menuList[this.menuListIndex].name
+  //   }
+  //   next()
+  //   // 在当前路由改变，但是该组件被复用时调用
+  //   // 举例来说，对于一个带有动态参数的路径 /foo/:id，在 /foo/1 和 /foo/2 之间跳转的时候，
+  //   // 由于会渲染同样的 Foo 组件，因此组件实例会被复用。而这个钩子就会在这个情况下被调用。
+  //   // 可以访问组件实例 `this`
+  // },
   mounted () {
     /**
      * @description 初始化设置面包屑导航和标签导航

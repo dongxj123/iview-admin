@@ -3,7 +3,7 @@
         <Table :loading="loading" border ref="selection" :columns="columns4" :data="data1" @on-selection-change="onSelectionChange"></Table>
         <Button @click="handleSelectAll(true)" style="margin-top:9px;">全选</Button>
         <Button @click="handleSelectAll(false)" style="margin-left:9px;margin-top:9px;">取消全选</Button>
-        <Button type="info" @click="confirm" style="margin-left:9px;margin-top:9px;">切换</Button>
+        <Button type="info" @click="confirm" style="margin-left:9px;margin-top:9px;" :disabled="disabled">{{buttonName}}</Button>
         <Modal
         v-model="modal1"
         title="请输入用户名密码"
@@ -44,12 +44,17 @@
 </template>
 <script>
 import {
-  getServerList,
-  operateServer
+  getDataByMenu,
+  operateServer,
+  getMenuList
 } from '@/api/routers'
 export default {
   data () {
     return {
+      id: 1,
+      menuList: [],
+      disabled: true,
+      buttonName: '',
       menuData: {},
       formArg: {
         username: '',
@@ -68,16 +73,6 @@ export default {
       modal2: false,
       loading: false,
       columns4: [
-        {
-          title: 'ip',
-          key: 'ip',
-          align: 'center'
-        },
-        {
-          title: '状态',
-          key: 'status',
-          align: 'center'
-        },
         {
           type: 'selection',
           width: 60,
@@ -112,7 +107,7 @@ export default {
             'selected_servers': this.selectedIP,
             'username': this.formArg.username,
             'password': this.formArg.pwd,
-            'operate_type': 1
+            'operate_type': this.id
           }
           operateServer(operateServerParam).then(res => {
             if (res.data.code === 0) {
@@ -131,13 +126,33 @@ export default {
       this.$refs['formArg'].resetFields()
       this.modal1 = false
     },
-    loadTable () {
+    loadTable (_id) {
       this.loading = true
-      getServerList().then(res => {
-        this.loading = false
-        this.data1 = res.data.data
-        for (var i in this.data1) {
-          this.data1[i].status = this.data1[i].status === 1 ? '认证' : '非认证'
+      getDataByMenu(_id).then(res => {
+        if (res.data.code === 0) {
+          this.loading = false
+          this.disabled = false
+          let tableHead = res.data.data.field_list
+          this.data1 = res.data.data.data_list
+          this.columns4 = [{
+            type: 'selection',
+            width: 60,
+            align: 'center'
+          }]
+          for (var i in tableHead) {
+            this.columns4.push({
+              title: tableHead[i],
+              key: tableHead[i],
+              align: 'center'
+            })
+          }
+        // for (var i in this.data1) {
+        //   this.data1[i].status = this.data1[i].status === 1 ? '认证' : '非认证'
+        // }
+        } else {
+          this.data1 = []
+          this.disabled = true
+          this.$Message.error(res.data.message)
         }
       }).catch(err => {
         this.$Message.error(err.message)
@@ -145,9 +160,36 @@ export default {
     }
   },
   created () {
-    let id = this.$route.query.id
-    this.menuData = this.$store.state.menuList[id]
-    this.loadTable()
+    getMenuList().then(res => {
+      let menus = res.data.data
+      menus.forEach((menu, index) => {
+        menus[index].meta = { 'title': menu.name }
+      })
+      this.menuList = menus
+      let id = parseInt(this.$route.query.id)
+      this.id = id
+      for (var i in menus) {
+        if (menus[i].id === id) this.menuData = menus[i]
+      }
+      this.buttonName = this.menuData.btn_name
+      this.loadTable(id)
+    }).catch(err => {
+      console.log(err)
+    })
+  },
+  beforeRouteUpdate (to, from, next) {
+    let id = parseInt(to.query.id)
+    this.id = id
+    for (var i in this.menuList) {
+      if (this.menuList[i].id === id) this.menuData = this.menuList[i]
+    }
+    this.buttonName = this.menuData.btn_name
+    this.loadTable(id)
+    next()
+    // 在当前路由改变，但是该组件被复用时调用
+    // 举例来说，对于一个带有动态参数的路径 /foo/:id，在 /foo/1 和 /foo/2 之间跳转的时候，
+    // 由于会渲染同样的 Foo 组件，因此组件实例会被复用。而这个钩子就会在这个情况下被调用。
+    // 可以访问组件实例 `this`
   },
   watch: {
     modal1 (newVal) {
@@ -156,5 +198,19 @@ export default {
       }
     }
   }
+  // menuList(newVal){
+  //   let id = parseInt(this.$route.query.id)
+  //   this.id=id
+  //   for(var i in newVal){
+  //     if(newVal[i].id===id) this.menuData=newVal[i]
+  //   }
+  //   this.buttonName=this.menuData.btn_name
+  //   this.loadTable(id)
+  // }
+  // computed:{
+  //   menuList () {
+  //     return this.$store.state.menuList
+  //   }
+  // }
 }
 </script>
