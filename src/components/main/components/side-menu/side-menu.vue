@@ -1,26 +1,26 @@
 <template>
   <div class="side-menu-wrapper">
     <slot></slot>
-    <Menu ref="menu" v-show="!collapsed" :active-name="activeName" :open-names="openedNames" :accordion="accordion" :theme="theme" width="auto" @on-select="handleSelect">
+    <Menu ref="menu" v-show="!collapsed" :active-name="$route.query.id" :open-names="openedNames" :accordion="accordion" :theme="theme" width="auto" @on-select="handleSelect">
       <template v-for="(item,i) in menuList">
         <template v-if="item.children && item.children.length === 1">
           <side-menu-item v-if="showChildren(item)" :key="`menu-${item.name}`" :parent-item="item"></side-menu-item>
-          <menu-item v-else :name="i" :key="`menu-${item.children[0].name}`"><common-icon :type="item.children[0].icon || ''"/><span>{{ showTitle(item.children[0]) }}</span></menu-item>
+          <menu-item v-else :name="item.id" :key="`menu-${item.children[0].name}`"><common-icon :type="item.children[0].icon || ''"/><span>{{ showTitle(item.children[0]) }}</span></menu-item>
         </template>
         <template v-else>
           <side-menu-item v-if="showChildren(item)" :key="`menu-${item.name}`" :parent-item="item"></side-menu-item>
-          <menu-item v-else :name="i" :key="`menu-${item.name}-${i}`"><common-icon :type="item.icon || ''"/><span>{{ showTitle(item) }}</span></menu-item>
+          <menu-item v-else :name="item.id" :key="`menu-${item.name}-${i}`"><common-icon :type="item.icon || ''"/><span>{{ showTitle(item) }}</span></menu-item>
         </template>
       </template>
     </Menu>
-    <div class="menu-collapsed" v-show="collapsed" :list="menuList">
+    <!-- <div class="menu-collapsed" v-show="collapsed" :list="menuList">
       <template v-for="(item, index) in menuList">
         <collapsed-menu v-if="item.children && item.children.length > 1" @on-click="handleSelect" hide-title :root-icon-size="rootIconSize" :icon-size="iconSize" :theme="theme" :parent-item="item" :key="`drop-menu-${item.name}-${index}`"></collapsed-menu>
         <Tooltip transfer v-else :content="showTitle(item.children && item.children[0] ? item.children[0] : item)" placement="right" :key="`drop-menu-${item.name}-${index}`">
           <a @click="handleSelect(getNameOrHref(item, true))" class="drop-menu-a" :style="{textAlign: 'center'}"><common-icon :size="rootIconSize" :color="textColor" :type="item.icon || (item.children && item.children[0].icon)"/></a>
         </Tooltip>
       </template>
-    </div>
+    </div> -->
   </div>
 </template>
 <script>
@@ -60,8 +60,8 @@ export default {
     },
     accordion: Boolean,
     activeName: {
-      type: String,
-      default: ''
+      type: Number,
+      default: 1
     },
     openNames: {
       type: Array,
@@ -81,8 +81,8 @@ export default {
       return this.$route.matched.map(item => item.name).filter(item => item !== name)
     },
     updateOpenName (name) {
-      if (name === this.$config.homeName) this.openedNames = []
-      else this.openedNames = this.getOpenedNamesByActiveName(name)
+      // if (name === this.$config.homeName) this.openedNames = []
+      // else this.openedNames = this.getOpenedNamesByActiveName(name)
     }
   },
   computed: {
@@ -92,17 +92,18 @@ export default {
   },
   watch: {
     activeName (name) {
-      if (this.accordion) this.openedNames = this.getOpenedNamesByActiveName(name)
-      else this.openedNames = getUnion(this.openedNames, this.getOpenedNamesByActiveName(name))
-    },
-    openNames (newNames) {
-      this.openedNames = newNames
-    },
-    openedNames () {
-      this.$nextTick(() => {
-        this.$refs.menu.updateOpened()
-      })
+
+      // if (this.accordion) this.openedNames = this.getOpenedNamesByActiveName(name)
+      // else this.openedNames = getUnion(this.openedNames, this.getOpenedNamesByActiveName(name))
     }
+    // openNames (newNames) {
+    //   this.openedNames = newNames
+    // },
+    // openedNames () {
+    //   this.$nextTick(() => {
+    //     this.$refs.menu.updateOpened()
+    //   })
+    // }
   },
   mounted () {
     this.openedNames = getUnion(this.openedNames, this.getOpenedNamesByActiveName(name))

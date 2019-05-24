@@ -1,7 +1,7 @@
 <template>
   <Layout style="height: 100%" class="main">
     <Sider hide-trigger collapsible :width="256" :collapsed-width="64" v-model="collapsed" class="left-sider" :style="{overflow: 'hidden'}">
-      <side-menu accordion ref="sideMenu" :active-name="$route.name" :collapsed="collapsed" @on-select="leftTurnToPage" :menu-list="menuList">
+      <side-menu accordion ref="sideMenu" :active-name="activeName" :collapsed="collapsed" @on-select="leftTurnToPage" :menu-list="menuList">
         <!-- 需要放在菜单上面的内容，如Logo，写在side-menu标签内部，如下 -->
         <div class="logo-con">
           <!-- <img v-show="!collapsed" :src="maxLogo" key="max-logo" />
@@ -69,6 +69,7 @@ export default {
   },
   data () {
     return {
+      activeName: 1,
       collapsed: false,
       minLogo,
       maxLogo,
@@ -145,11 +146,15 @@ export default {
         query
       })
     },
-    leftTurnToPage (menuListIndex) {
+    leftTurnToPage (id) {
       // this.menuListIndex = menuListIndex
+      let url
+      for (var i in this.menuList) {
+        if (this.menuList[i].id === parseInt(id)) url = this.menuList[i].url
+      }
       this.$router.push({
-        name: this.menuList[menuListIndex].url,
-        query: { id: this.menuList[menuListIndex].id }
+        name: url,
+        query: { id: id }
       })
     },
     handleCollapsedChange (state) {
@@ -185,7 +190,6 @@ export default {
   watch: {
     '$route' (newRoute) {
       let id = parseInt(newRoute.query.id)
-      debugger
       for (var i in this.menuList) {
         if (this.menuList[i].id === id) newRoute.meta.title = this.menuList[i].name
       }
@@ -196,10 +200,13 @@ export default {
       })
       this.setBreadCrumb(newRoute)
       this.setTagNavList(getNewTagList(this.tagNavList, newRoute))
-      this.$refs.sideMenu.updateOpenName(newRoute.name)
+      // this.$refs.sideMenu.updateOpenName(newRoute.query.id)
+      this.activeName = newRoute.query.id
     }
   },
   created () {
+    this.activeName = parseInt(this.$route.query.id)
+    // console.log(parseInt(this.$route.query.id))
     this.$store.dispatch('updateSideMenuList')
   },
   // beforeRouteUpdate (to, from, next) {
