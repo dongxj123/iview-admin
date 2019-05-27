@@ -7,10 +7,13 @@
         <!-- <DropdownItem name="message">
           消息中心<Badge style="margin-left: 10px" :count="messageUnreadCount"></Badge>
         </DropdownItem> -->
-        <DropdownItem>当前用户：{{username}}</DropdownItem>
-        <DropdownItem name="menuManager">
+        <DropdownItem>当前用户：{{username.username}}</DropdownItem>
+        <DropdownItem name="menuManager" v-show="username.is_superuser">
             <!-- <Icon type="md-settings"></Icon> -->
             菜单管理
+        </DropdownItem>
+        <DropdownItem name="userManager" v-show="username.is_superuser">
+            用户管理
         </DropdownItem>
         <DropdownItem name="logout">退出登录</DropdownItem>
       </DropdownMenu>
@@ -25,7 +28,7 @@ import { getUserName } from '@/libs/util'
 export default {
   data () {
     return {
-      username: getUserName()
+      username: JSON.parse(getUserName())
     }
   },
   name: 'User',
@@ -58,6 +61,9 @@ export default {
     menuManager () {
       this.$router.push({ path: '/menuManager' })
     },
+    userManager () {
+      this.$router.push({ path: '/userManager' })
+    },
     handleClick (name) {
       switch (name) {
         case 'logout': this.logout()
@@ -65,6 +71,8 @@ export default {
         case 'message': this.message()
           break
         case 'menuManager':this.menuManager()
+          break
+        case 'userManager': this.userManager()
           break
       }
     }

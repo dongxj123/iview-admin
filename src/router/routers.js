@@ -493,6 +493,14 @@ export default [
     component: Main,
     children: [
       {
+        path: '/userManager',
+        name: 'userManager',
+        meta: {
+          title: '用户管理'
+        },
+        component: () => import('@/view/userManager/userManager.vue')
+      },
+      {
         path: '/menuManager',
         name: 'menuManager',
         meta: {

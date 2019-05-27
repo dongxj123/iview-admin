@@ -130,3 +130,38 @@ export const getDataByMenu = (id) => {
     method: 'post'
   })
 }
+export const addSysUser = (addSysUserParam) => {
+  const data = JSON.stringify(addSysUserParam)
+  return axios.request({
+    headers: { 'AUTHORIZATION': 'token ' + getToken() },
+    url: 'rongzai/add-sys-user/',
+    data,
+    method: 'post'
+  })
+}
+
+export const geSysUserList = () => {
+  return axios.request({
+    headers: { 'AUTHORIZATION': 'token ' + getToken() },
+    url: 'rongzai/get-sys-user-list/',
+    method: 'get'
+  })
+}
+export const resetPassword = (id) => {
+  const data = JSON.stringify({ id: id })
+  return axios.request({
+    headers: { 'AUTHORIZATION': 'token ' + getToken() },
+    url: 'rongzai/reset-password/',
+    data,
+    method: 'post'
+  })
+}
+export const removeSysUser = (id) => {
+  const data = JSON.stringify({ id: id })
+  return axios.request({
+    headers: { 'AUTHORIZATION': 'token ' + getToken() },
+    url: 'rongzai/remove-sys-user/',
+    data,
+    method: 'post'
+  })
+}

@@ -31,6 +31,7 @@ export default {
     handleSubmit ({ userName, password }) {
       this.handleLogin({ userName, password }).then(res => {
         if (res.code === 0) {
+          localStorage.removeItem('tagNaveList')
           // this.getUserInfo().then(res => {
           this.$router.push({
             name: this.$config.homeName

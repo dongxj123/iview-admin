@@ -84,7 +84,10 @@ export default {
         }).then(res => {
           const data = res.data
           commit('setToken', data.data.token)
-          setUserName(data.data.username)
+          setUserName(JSON.stringify({
+            username: data.data.username,
+            is_superuser: data.data.is_superuser,
+            id: data.data.id }))
           resolve(data)
         }).catch(err => {
           reject(err)
