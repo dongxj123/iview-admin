@@ -1,10 +1,10 @@
 <template>
     <div>
         <Dropdown @on-click="editButton($event,item)" class="button-distance" trigger="contextMenu" v-for="(item,index) in buttonList" :key="index">
-            <Button :type="item.have_sms_auth==0?'success':'error'" @click="confirm(item)">
+            <Button style="width:150px;" :type="item.have_sms_auth==0?'success':'error'" @click="confirm(item)">
                 {{item.name}}
             </Button>
-            <DropdownMenu slot="list">
+            <DropdownMenu slot="list" v-show="username.is_superuser">
                 <DropdownItem name="edit">编辑</DropdownItem>
             </DropdownMenu>
         </Dropdown>
@@ -94,10 +94,12 @@ import {
   executeButton,
   editButton
 } from '@/api/routers'
+import { getUserName } from '@/libs/util'
 // import { setToken, getToken } from '@/libs/util'
 export default {
   data () {
     return {
+      username: JSON.parse(getUserName()),
       operateType: '',
       editID: '',
       submitName: '',
@@ -232,7 +234,7 @@ export default {
         if (valid) {
           if (this.operateType === 'add') {
             this.disabled_add = true
-            var addButtonParam = this.formValidate
+            var addButtonParam = Object.assign({}, this.formValidate)
             addButtonParam.have_password_auth = this.formValidate.have_password_auth ? 1 : 0
             addButtonParam.have_sms_auth = this.formValidate.have_sms_auth ? 1 : 0
             addButton(addButtonParam).then(res => {

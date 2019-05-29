@@ -5,6 +5,7 @@
                 <strong>{{ row.username }}</strong>
             </template>
             <template slot-scope="{ row, index }" slot="action">
+                <Button v-show="!row.is_superuser" type="success" size="small" style="margin-right: 5px" @click="setPermission(row.id,index)">菜单设置</Button>
                 <Button v-show="!row.is_superuser" type="primary" size="small" style="margin-right: 5px" @click="resetPassword(row.id,index)">重置密码</Button>
                 <Button v-show="!row.is_superuser" type="error" size="small" @click="remove(row.id,index)">删除</Button>
             </template>
@@ -27,6 +28,16 @@
                 <Button @click="cancel">取消</Button>
             </div>
         </Modal>
+        <Modal
+        v-model="modal2"
+        title="权限设置"
+        >
+            <Tree :data="data2" show-checkbox ref="tree"></Tree>
+            <div slot="footer">
+                <Button type="primary" @click="resetPassword_ok">保存</Button>
+                <Button @click="resetPassword_cancel">取消</Button>
+            </div>
+        </Modal>
     </div>
 </template>
 <script>
@@ -34,7 +45,10 @@ import {
   addSysUser,
   geSysUserList,
   resetPassword,
-  removeSysUser
+  removeSysUser,
+  geAllMenuList,
+  getUserMenuids,
+  setUserMenuList
 } from '@/api/routers'
 export default {
   data () {
@@ -54,6 +68,7 @@ export default {
         ]
       },
       modal1: false,
+      modal2: false,
       loading: false,
       columns4: [
         {
@@ -74,15 +89,76 @@ export default {
         {
           title: '操作',
           slot: 'action',
-          width: 200,
+          width: 250,
           align: 'center'
         }
 
       ],
-      data1: []
+      data1: [],
+      data2: [],
+      sys_user_id: 0
     }
   },
   methods: {
+    setPermission (id, index) {
+      this.sys_user_id = id
+      geAllMenuList().then(res => {
+        if (res.data.code === 0) {
+          let allMenuList = res.data.data
+          getUserMenuids(id).then(res2 => {
+            let userMenuids = res2.data.data
+            if (res2.data.code === 0) {
+              let treeData = [{
+                title: '全部',
+                expand: true
+              }]
+              let children = []
+              for (var i in allMenuList) {
+                let childrenItem = {
+                  title: allMenuList[i].name,
+                  checked: userMenuids.indexOf(allMenuList[i].id) > -1,
+                  menuId: allMenuList[i].id
+                }
+                children.push(childrenItem)
+              }
+              treeData[0].children = children
+              this.data2 = treeData
+              this.modal2 = true
+            } else {
+              this.$Message.error(res.data.message)
+            }
+          }).catch(err => {
+            this.$Message.error(err.message)
+          })
+        } else {
+          this.$Message.error(res.data.message)
+        }
+      }).catch(err => {
+        this.$Message.error(err.message)
+      })
+    },
+    resetPassword_ok () {
+      let checkedNodes = this.$refs['tree'].getCheckedNodes()
+      let setUserMenuListParam = {
+        sys_user_id: this.sys_user_id
+      }
+      let menuIds = []
+      for (var i in checkedNodes) {
+        if (checkedNodes[i].menuId) {
+          menuIds.push(checkedNodes[i].menuId)
+        }
+      }
+      setUserMenuListParam.menu_ids = menuIds
+      setUserMenuList(setUserMenuListParam).then(res => {
+        if (res.data.code === 0) this.$Message.success(res.data.message)
+        this.modal2 = false
+      }).catch(err => {
+        this.$Message.error(err.message)
+      })
+    },
+    resetPassword_cancel () {
+      this.modal2 = false
+    },
     add_open () {
       this.modal1 = true
     },
@@ -164,6 +240,7 @@ export default {
         }
       })
     }
+
   },
   created () {
     this.loadTable()

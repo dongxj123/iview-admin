@@ -165,3 +165,37 @@ export const removeSysUser = (id) => {
     method: 'post'
   })
 }
+export const changePassword = (changePasswordParam) => {
+  const data = JSON.stringify(changePasswordParam)
+  return axios.request({
+    headers: { 'AUTHORIZATION': 'token ' + getToken() },
+    url: 'rongzai/change-password/',
+    data,
+    method: 'post'
+  })
+}
+export const geAllMenuList = () => {
+  return axios.request({
+    headers: { 'AUTHORIZATION': 'token ' + getToken() },
+    url: 'rongzai/get-all-menu-list/',
+    method: 'get'
+  })
+}
+export const getUserMenuids = (id) => {
+  const data = JSON.stringify({ id: id })
+  return axios.request({
+    headers: { 'AUTHORIZATION': 'token ' + getToken() },
+    url: 'rongzai/get-user-menuids/',
+    data,
+    method: 'post'
+  })
+}
+export const setUserMenuList = (setUserMenuListParam) => {
+  const data = JSON.stringify(setUserMenuListParam)
+  return axios.request({
+    headers: { 'AUTHORIZATION': 'token ' + getToken() },
+    url: 'rongzai/set-user-menu-list/',
+    data,
+    method: 'post'
+  })
+}
