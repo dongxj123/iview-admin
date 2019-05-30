@@ -37,7 +37,7 @@
                 </FormItem>
             </Form>
             <div slot="footer">
-                <Button type="primary" @click="ok">添加</Button>
+                <Button type="primary" @click="ok">保存</Button>
                 <Button @click="cancel">取消</Button>
             </div>
         </Modal>
@@ -77,7 +77,7 @@ export default {
           trigger: 'blur' }
         ],
         new_password: [
-          { required: true, trigger: 'blur' },
+          { required: true, trigger: 'blur', message: '新密码不能为空' },
           { min: 6, message: '请输入最少6位' }
         ]
       },

@@ -9,7 +9,7 @@
             </DropdownMenu>
         </Dropdown>
         <!-- <Button class="button-distance" @click="confirm(item)" :type="item.have_sms_auth==0?'success':'error'" v-for="(item,index) in buttonList" :key="index">{{item.name}}</Button> -->
-        <Button class="add-btn" type="primary" @click="openAdd('add')">添加按钮</Button>
+        <Button class="add-btn" v-show="username.is_superuser" type="primary" @click="openAdd('add')">添加按钮</Button>
         <Modal
         v-model="modal1"
         title="容灾按钮操作"
