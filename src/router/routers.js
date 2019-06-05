@@ -501,10 +501,18 @@ export default [
         component: () => import('@/view/userManager/userManager.vue')
       },
       {
+        path: '/buttonManager',
+        name: 'buttonManager',
+        meta: {
+          title: '按钮类型菜单管理'
+        },
+        component: () => import('@/view/buttonManager/buttonManager.vue')
+      },
+      {
         path: '/menuManager',
         name: 'menuManager',
         meta: {
-          title: '菜单管理'
+          title: '表格类型菜单管理'
         },
         component: () => import('@/view/menuManager/menuManager.vue')
       },

@@ -18,22 +18,8 @@
                 <FormItem label="菜单名称：" prop="name">
                     <Input v-model="formArg.name" placeholder="请输入菜单名称：..."></Input>
                 </FormItem>
-                <FormItem label="数据库的表名：" prop="table_name">
-                    <Input v-model="formArg.table_name" placeholder="请输入数据库的表名：..."></Input>
-                </FormItem>
-                <FormItem label="按钮名称：" prop="btn_name">
-                    <Input v-model="formArg.btn_name" placeholder="请输入按钮名称：..."></Input>
-                </FormItem>
-                <FormItem label="选择按钮脚本：" prop="btn_script">
-                    <Select v-model="formArg.btn_script" placeholder="请选择按钮脚本">
-                        <Option v-for="(val,i) in scriptList" :value="val" :key="i">{{ val }}</Option>
-                    </Select>
-                </FormItem>
                 <FormItem label="排序值：" prop="order_num">
                     <Input type="number" v-model="formArg.order_num" placeholder="请输入排序值：..."></Input>
-                </FormItem>
-                <FormItem label="静态参数：" prop="static_param">
-                    <Input v-model="formArg.static_param" placeholder="请输入静态参数（可为空）：..."></Input>
                 </FormItem>
             </Form>
             <div slot="footer">
@@ -60,29 +46,16 @@ export default {
       sub_name: '',
       formArg: {
         name: '',
-        table_name: '',
-        btn_name: '',
         order_num: '',
-        btn_script: '',
-        static_param: '',
-        type: 2,
-        url: 'rongzai/ips-change'
+        type: 3,
+        url: 'rongzai/rongzai-detail'
       },
       ruleformArg: {
         name: [
           { required: true, message: '菜单名称不能为空', trigger: 'blur' }
         ],
-        table_name: [
-          { required: true, message: '数据库表名不能为空', trigger: 'blur' }
-        ],
-        btn_name: [
-          { required: true, message: '按钮名称不能为空', trigger: 'blur' }
-        ],
         order_num: [
           { required: true, message: '排序值不能为空' }
-        ],
-        btn_script: [
-          { required: true, message: '请选择按钮脚本', trigger: 'change' }
         ]
       },
       operateResult: [],
@@ -97,21 +70,6 @@ export default {
         {
           title: '名称',
           key: 'name',
-          align: 'center'
-        },
-        {
-          title: '表',
-          key: 'table_name',
-          align: 'center'
-        },
-        {
-          title: '按钮名称',
-          key: 'btn_name',
-          align: 'center'
-        },
-        {
-          title: '执行脚本',
-          key: 'btn_script',
           align: 'center'
         },
         {
@@ -184,7 +142,7 @@ export default {
         let menus = res.data.data
         menus.forEach((menu, index) => {
           menus[index].meta = { 'title': menu.name }
-          if (menu.type === 2) this.menuList.push(menus[index])
+          if (menu.type === 3) this.menuList.push(menus[index])
         })
         // this.menuList = menus
       }).catch(err => {

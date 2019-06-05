@@ -10,7 +10,10 @@
         <DropdownItem>当前用户：{{username.username}}</DropdownItem>
         <DropdownItem name="menuManager" v-show="username.is_superuser">
             <!-- <Icon type="md-settings"></Icon> -->
-            菜单管理
+            表格类型菜单管理
+        </DropdownItem>
+        <DropdownItem name="buutonManager" v-show="username.is_superuser">
+            按钮类型菜单管理
         </DropdownItem>
         <DropdownItem name="userManager" v-show="username.is_superuser">
             用户管理
@@ -121,6 +124,9 @@ export default {
     changePassword () {
       this.modal1 = true
     },
+    buutonManager () {
+      this.$router.push({ path: '/buttonManager' })
+    },
     handleClick (name) {
       switch (name) {
         case 'logout': this.logout()
@@ -132,6 +138,8 @@ export default {
         case 'userManager': this.userManager()
           break
         case 'changePassword': this.changePassword()
+          break
+        case 'buutonManager': this.buutonManager()
           break
       }
     },

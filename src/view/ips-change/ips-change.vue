@@ -160,6 +160,7 @@ export default {
     }
   },
   created () {
+    // 根据路由上的id去和menuList匹配找到当前的menu信息
     getMenuList().then(res => {
       let menus = res.data.data
       menus.forEach((menu, index) => {

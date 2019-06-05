@@ -6,6 +6,7 @@
             </Button>
             <DropdownMenu slot="list" v-show="username.is_superuser">
                 <DropdownItem name="edit">编辑</DropdownItem>
+                <DropdownItem name="deleteBtn" style="color: #ed4014">删除</DropdownItem>
             </DropdownMenu>
         </Dropdown>
         <!-- <Button class="button-distance" @click="confirm(item)" :type="item.have_sms_auth==0?'success':'error'" v-for="(item,index) in buttonList" :key="index">{{item.name}}</Button> -->
@@ -88,11 +89,12 @@
 
 <script>
 import {
-  getrongzaiDetail,
   getScripts,
   addButton,
   executeButton,
-  editButton
+  editButton,
+  deleteButton,
+  getButtonsByMenu
 } from '@/api/routers'
 import { getUserName } from '@/libs/util'
 // import { setToken, getToken } from '@/libs/util'
@@ -162,21 +164,40 @@ export default {
       }
     },
     editButton (event, item) {
-      this.operateType = 'edit'
-      this.submitName = '确认编辑'
-      this.formValidate = {
-        name: item.name,
-        script: item.script,
-        static_param: item.static_param,
-        have_password_auth: !!item.have_password_auth,
-        have_sms_auth: !!item.have_sms_auth,
-        order_num: item.order_num
+      if (event === 'edit') {
+        this.operateType = 'edit'
+        this.submitName = '确认编辑'
+        this.formValidate = {
+          name: item.name,
+          script: item.script,
+          static_param: item.static_param,
+          have_password_auth: !!item.have_password_auth,
+          have_sms_auth: !!item.have_sms_auth,
+          order_num: item.order_num
+        }
+        // this.have_password_auth=item.have_password_auth?true:false;
+        // this.have_sms_auth=item.have_sms_auth?true:false;
+        this.editID = item.id
+        this.$Message.info('您正在编辑...')
+        this.modal1 = true
+      } else if (event === 'deleteBtn') {
+        this.$Modal.confirm({
+          title: '确认删除？',
+          content: `${item.name}`,
+          onOk: () => {
+            let id = item.id
+            deleteButton(id).then(res => {
+              if (res.data.code === 0) this.$Message.success('已删除')
+              this.reload(this.id)
+            }).catch(err => {
+              this.$Message.error(err.message)
+            })
+          },
+          onCancel: () => {
+
+          }
+        })
       }
-      // this.have_password_auth=item.have_password_auth?true:false;
-      // this.have_sms_auth=item.have_sms_auth?true:false;
-      this.editID = item.id
-      this.$Message.info('您正在编辑...')
-      this.modal1 = true
     },
     ok () {
       if (!this.curentBtn.have_password_auth && !this.curentBtn.have_sms_auth) {
@@ -237,12 +258,13 @@ export default {
             var addButtonParam = Object.assign({}, this.formValidate)
             addButtonParam.have_password_auth = this.formValidate.have_password_auth ? 1 : 0
             addButtonParam.have_sms_auth = this.formValidate.have_sms_auth ? 1 : 0
+            addButtonParam.menu_id = this.$route.query.id
             addButton(addButtonParam).then(res => {
               if (res.data.code === 0) {
                 this.$Message.success(res.data.message)
               }
               this.disabled_add = false
-              this.reload()
+              this.reload(this.id)
               this.modal1 = false
             }).catch(err => {
               console.log(err)
@@ -259,7 +281,7 @@ export default {
                 this.$Message.success('修改成功')
               }
               this.disabled_add = false
-              this.reload()
+              this.reload(this.id)
               this.modal1 = false
             }).catch(err => {
               console.log(err)
@@ -275,9 +297,9 @@ export default {
       this.$refs['formValidate'].resetFields()
       this.disabled_add = false
     },
-    reload () {
+    reload (_id) {
       let buttons = []
-      getrongzaiDetail().then(res => {
+      getButtonsByMenu(_id).then(res => {
         buttons = res.data.data
         this.buttonList = buttons
       }).catch(err => {
@@ -298,13 +320,16 @@ export default {
     }
   },
   created () {
-    let buttons = []
-    getrongzaiDetail().then(res => {
-      buttons = res.data.data
-      this.buttonList = buttons
-    }).catch(err => {
-      this.$Message.error(err.message)
-    })
+    this.reload(this.id)
+  },
+  beforeRouteUpdate (to, from, next) {
+    let id = parseInt(to.query.id)
+    this.reload(id)
+    next()
+    // 在当前路由改变，但是该组件被复用时调用
+    // 举例来说，对于一个带有动态参数的路径 /foo/:id，在 /foo/1 和 /foo/2 之间跳转的时候，
+    // 由于会渲染同样的 Foo 组件，因此组件实例会被复用。而这个钩子就会在这个情况下被调用。
+    // 可以访问组件实例 `this`
   },
   watch: {
     modal1 (newVal) {
@@ -325,6 +350,11 @@ export default {
       if (newVal) {
         this.$refs['formArg'].resetFields()
       }
+    }
+  },
+  computed: {
+    id () {
+      return parseInt(this.$route.query.id)
     }
   }
 }

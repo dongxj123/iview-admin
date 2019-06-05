@@ -199,3 +199,21 @@ export const setUserMenuList = (setUserMenuListParam) => {
     method: 'post'
   })
 }
+export const deleteButton = (id) => {
+  const data = JSON.stringify({ id: id })
+  return axios.request({
+    headers: { 'AUTHORIZATION': 'token ' + getToken() },
+    url: 'rongzai/delete-button/',
+    data,
+    method: 'post'
+  })
+}
+export const getButtonsByMenu = (id) => {
+  const data = JSON.stringify({ id: id })
+  return axios.request({
+    headers: { 'AUTHORIZATION': 'token ' + getToken() },
+    url: 'rongzai/get-buttons-by-menu/',
+    data,
+    method: 'post'
+  })
+}
