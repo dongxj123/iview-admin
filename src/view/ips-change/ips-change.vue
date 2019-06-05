@@ -4,7 +4,7 @@
         <Button @click="handleSelectAll(true)" style="margin-top:9px;">全选</Button>
         <Button @click="handleSelectAll(false)" style="margin-left:9px;margin-top:9px;">取消全选</Button>
         <Button type="info" @click="confirm" style="margin-left:9px;margin-top:9px;" :disabled="disabled">{{buttonName}}</Button>
-        <Modal
+        <!-- <Modal
         v-model="modal1"
         title="请输入用户名密码"
         >
@@ -15,6 +15,31 @@
             <FormItem label="密码：" prop="pwd">
                 <Input v-model="formArg.pwd" placeholder="请输入密码：..."></Input>
             </FormItem>
+        </Form>
+        <div slot="footer">
+            <Button type="primary" @click="ok">确定</Button>
+            <Button @click="cancel">取消</Button>
+        </div>
+    </Modal> -->
+    <Modal
+        v-model="modal1"
+        title="确认执行脚本？"
+        >
+        <Form ref="formArg" :model="formArg" :rules="ruleformArg" :label-width="90">
+            <FormItem label="按钮名称：" style="margin-bottom:10px;">
+                <span>{{menuData.name}}</span>
+            </FormItem>
+            <FormItem label="用户名：" prop="username" v-if="menuData.have_password_auth==1">
+                <Input v-model="formArg.username" placeholder="请输入用户名：..."></Input>
+            </FormItem>
+            <FormItem label="密码：" prop="pwd" v-if="menuData.have_password_auth==1">
+                <Input v-model="formArg.pwd" placeholder="请输入密码：..."></Input>
+            </FormItem>
+            <FormItem label="验证码：" prop="verifyCode" v-if="menuData.have_sms_auth==1">
+                <Input v-model="formArg.verifyCode" placeholder="请输入验证码：..."></Input>
+                <Button type="primary" style="margin-top:10px;" @click="sendMsg" :disabled="disabled_sm">{{name_sm}}</Button>
+            </FormItem>
+
         </Form>
         <div slot="footer">
             <Button type="primary" @click="ok">确定</Button>
@@ -52,13 +77,16 @@ export default {
   data () {
     return {
       id: 1,
+      name_sm: '发送验证码',
+      disabled_sm: false,
       menuList: [],
       disabled: true,
       buttonName: '',
       menuData: {},
       formArg: {
         username: '',
-        pwd: ''
+        pwd: '',
+        verifyCode: ''
       },
       ruleformArg: {
         username: [
@@ -66,6 +94,9 @@ export default {
         ],
         pwd: [
           { required: true, message: '密码不能为空', trigger: 'blur' }
+        ],
+        verifyCode: [
+          { required: true, message: '验证码不能为空', trigger: 'blur' }
         ]
       },
       operateResult: [],
@@ -84,6 +115,14 @@ export default {
     }
   },
   methods: {
+    sendMsg () {
+      // this.$router.push({
+      //   name:'rongzai/rongzai-detail',
+      //   query:{save:1}
+      // })
+      // this.disabled_sm = true
+      // this.name_sm = '再次发送（60）'
+    },
     handleSelectAll (status) {
       this.$refs.selection.selectAll(status)
     },
@@ -100,27 +139,36 @@ export default {
         this.$Message.warning('请先选择操作项')
       }
     },
-    ok () {
-      this.$refs['formArg'].validate((valid) => {
-        if (valid) {
-          var operateServerParam = {
-            'selected_servers': this.selectedIP,
-            'username': this.formArg.username,
-            'password': this.formArg.pwd,
-            'operate_type': this.id
-          }
-          operateServer(operateServerParam).then(res => {
-            if (res.data.code === 0) {
-              this.$Message.success(res.data.message)
-            }
-            this.operateResult = res.data.data
-            this.modal2 = true
-            this.modal1 = false
-          }).catch(err => {
-            this.$Message.error(err.message)
-          })
+    operateServer () {
+      var operateServerParam = {
+        'selected_servers': this.selectedIP,
+        'username': this.formArg.username,
+        'password': this.formArg.pwd,
+        'operate_type': this.id,
+        'sms_key': '1234',
+        'sms_code': '5678'
+      }
+      operateServer(operateServerParam).then(res => {
+        if (res.data.code === 0) {
+          this.$Message.success(res.data.message)
         }
+        this.operateResult = res.data.data
+        this.modal2 = true
+        this.modal1 = false
+      }).catch(err => {
+        this.$Message.error(err.message)
       })
+    },
+    ok () {
+      if (!this.menuData.have_password_auth && !this.menuData.have_sms_auth) {
+        this.operateServer()
+      } else {
+        this.$refs['formArg'].validate((valid) => {
+          if (valid) {
+            this.operateServer()
+          }
+        })
+      }
     },
     cancel () {
       this.$refs['formArg'].resetFields()

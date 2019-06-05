@@ -29,6 +29,10 @@
                         <Option v-for="(val,i) in scriptList" :value="val" :key="i">{{ val }}</Option>
                     </Select>
                 </FormItem>
+                <FormItem label="验证选项：">
+                    <Checkbox v-model="formArg.have_sms_auth">短信验证</Checkbox>
+                    <Checkbox v-model="formArg.have_password_auth">用户密码验证</Checkbox>
+                </FormItem>
                 <FormItem label="排序值：" prop="order_num">
                     <Input type="number" v-model="formArg.order_num" placeholder="请输入排序值：..."></Input>
                 </FormItem>
@@ -66,7 +70,9 @@ export default {
         btn_script: '',
         static_param: '',
         type: 2,
-        url: 'rongzai/ips-change'
+        url: 'rongzai/ips-change',
+        have_sms_auth: false,
+        have_password_auth: false
       },
       ruleformArg: {
         name: [
@@ -115,6 +121,16 @@ export default {
           align: 'center'
         },
         {
+          title: '短信验证',
+          key: 'have_sms_auth',
+          align: 'center'
+        },
+        {
+          title: '用户密码验证',
+          key: 'have_password_auth',
+          align: 'center'
+        },
+        {
           title: '排序值',
           key: 'order_num',
           align: 'center'
@@ -137,10 +153,12 @@ export default {
       this.operateType = 'add'
     },
     edit (index) {
+      this.formArg = Object.assign({}, this.menuList[index])
+      this.formArg.have_password_auth = !!this.formArg.have_password_auth
+      this.formArg.have_sms_auth = !!this.formArg.have_sms_auth
       this.sub_name = '更新'
       this.modal1 = true
       this.operateType = 'edit'
-      this.formArg = Object.assign({}, this.menuList[index])
     },
     ok () {
       this.$refs['formArg'].validate((valid) => {
@@ -148,6 +166,8 @@ export default {
           if (this.operateType === 'add') {
             var addMenuParam = Object.assign({}, this.formArg)
             addMenuParam.order_num = parseInt(addMenuParam.order_num)
+            addMenuParam.have_password_auth = addMenuParam.have_password_auth ? 1 : 0
+            addMenuParam.have_sms_auth = addMenuParam.have_sms_auth ? 1 : 0
             addMenu(addMenuParam).then(res => {
               if (res.data.code === 0) this.$Message.success(res.data.message)
               this.modal1 = false
@@ -159,6 +179,8 @@ export default {
           } else {
             var editMenuParam = Object.assign({}, this.formArg)
             editMenuParam.order_num = parseInt(editMenuParam.order_num)
+            editMenuParam.have_password_auth = editMenuParam.have_password_auth ? 1 : 0
+            editMenuParam.have_sms_auth = editMenuParam.have_sms_auth ? 1 : 0
             delete editMenuParam.meta
             editMenu(editMenuParam).then(res => {
               if (res.data.code === 0) this.$Message.success(res.data.message)
