@@ -82,13 +82,17 @@ export default {
           userName,
           password
         }).then(res => {
-          const data = res.data
-          commit('setToken', data.data.token)
-          setUserName(JSON.stringify({
-            username: data.data.username,
-            is_superuser: data.data.is_superuser,
-            id: data.data.id }))
-          resolve(data)
+          if (res.data.code === 0) {
+            const data = res.data
+            commit('setToken', data.data.token)
+            setUserName(JSON.stringify({
+              username: data.data.username,
+              is_superuser: data.data.is_superuser,
+              id: data.data.id }))
+            resolve(data)
+          } else {
+            Vue.prototype.$Message.error(res.data.message)
+          }
         }).catch(err => {
           reject(err)
           Vue.prototype.$Message.error(err.message)

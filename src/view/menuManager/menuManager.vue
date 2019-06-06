@@ -148,14 +148,17 @@ export default {
   },
   methods: {
     add_open () {
+      this.formArg.have_password_auth = false
+      this.formArg.have_sms_auth = false
+      // 打开新增界面复选框初始化
       this.sub_name = '添加'
       this.modal1 = true
       this.operateType = 'add'
     },
     edit (index) {
       this.formArg = Object.assign({}, this.menuList[index])
-      this.formArg.have_password_auth = !!this.formArg.have_password_auth
-      this.formArg.have_sms_auth = !!this.formArg.have_sms_auth
+      this.formArg.have_password_auth = this.formArg.have_password_auth === '是'
+      this.formArg.have_sms_auth = this.formArg.have_sms_auth === '是'
       this.sub_name = '更新'
       this.modal1 = true
       this.operateType = 'edit'
@@ -206,9 +209,14 @@ export default {
         let menus = res.data.data
         menus.forEach((menu, index) => {
           menus[index].meta = { 'title': menu.name }
-          if (menu.type === 2) this.menuList.push(menus[index])
+          if (menu.type === 2) {
+            this.menuList.push(menus[index])
+          }
         })
-        // this.menuList = menus
+        for (var i in this.menuList) {
+          this.menuList[i].have_sms_auth = this.menuList[i].have_sms_auth === 1 ? '是' : '否'
+          this.menuList[i].have_password_auth = this.menuList[i].have_password_auth === 1 ? '是' : '否'
+        }
       }).catch(err => {
         console.log(err)
         this.$Message.error(err.message)
