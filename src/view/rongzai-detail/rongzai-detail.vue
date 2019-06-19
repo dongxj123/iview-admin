@@ -71,7 +71,7 @@
                 <Input v-model="formArg.username" placeholder="请输入用户名：..."></Input>
             </FormItem>
             <FormItem label="密码：" prop="pwd" v-if="curentBtn.have_password_auth==1">
-                <Input v-model="formArg.pwd" placeholder="请输入密码：..."></Input>
+                <Input v-model="formArg.pwd" :type="inputType" @on-focus="typeToPassWord" placeholder="请输入密码：..."></Input>
             </FormItem>
             <FormItem label="验证码：" prop="verifyCode" v-if="curentBtn.have_sms_auth==1">
                 <Input v-model="formArg.verifyCode" placeholder="请输入验证码：..."></Input>
@@ -101,6 +101,7 @@ import { getUserName } from '@/libs/util'
 export default {
   data () {
     return {
+      inputType: 'text',
       username: JSON.parse(getUserName()),
       operateType: '',
       editID: '',
@@ -153,6 +154,9 @@ export default {
     }
   },
   methods: {
+    typeToPassWord () {
+      this.inputType = 'password'
+    },
     openAdd (fun) {
       this.operateType = 'add'
       // 执行handleSubmit时判断是添加还是编辑

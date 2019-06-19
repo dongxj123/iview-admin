@@ -45,6 +45,10 @@ export default {
           key: 'options'
         },
         {
+          title: 'ip',
+          key: 'ip_param'
+        },
+        {
           title: '标准输出',
           key: 'stdout'
         }

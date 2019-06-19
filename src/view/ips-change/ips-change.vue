@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Table :loading="loading" border ref="selection" :columns="columns4" :data="data1" @on-selection-change="onSelectionChange"></Table>
+        <Table size="small" :loading="loading" border ref="selection" :columns="columns4" :data="data1" @on-selection-change="onSelectionChange"></Table>
         <Button @click="handleSelectAll(true)" style="margin-top:9px;">全选</Button>
         <Button @click="handleSelectAll(false)" style="margin-left:9px;margin-top:9px;">取消全选</Button>
         <Button type="info" @click="confirm" style="margin-left:9px;margin-top:9px;" :disabled="disabled">{{buttonName}}</Button>
@@ -33,7 +33,7 @@
                 <Input v-model="formArg.username" placeholder="请输入用户名：..."></Input>
             </FormItem>
             <FormItem label="密码：" prop="pwd" v-if="menuData.have_password_auth==1">
-                <Input v-model="formArg.pwd" placeholder="请输入密码：..."></Input>
+                <Input v-model="formArg.pwd" :type="inputType" @on-focus="typeToPassWord" placeholder="请输入密码：..."></Input>
             </FormItem>
             <FormItem label="验证码：" prop="verifyCode" v-if="menuData.have_sms_auth==1">
                 <Input v-model="formArg.verifyCode" placeholder="请输入验证码：..."></Input>
@@ -76,6 +76,7 @@ import {
 export default {
   data () {
     return {
+      inputType: 'text',
       id: 1,
       name_sm: '发送验证码',
       disabled_sm: false,
@@ -115,6 +116,9 @@ export default {
     }
   },
   methods: {
+    typeToPassWord () {
+      this.inputType = 'password'
+    },
     sendMsg () {
       // this.$router.push({
       //   name:'rongzai/rongzai-detail',
@@ -263,3 +267,8 @@ export default {
   // }
 }
 </script>
+<style scope>
+.ivu-table-small td {
+    height: 30px;
+}
+</style>

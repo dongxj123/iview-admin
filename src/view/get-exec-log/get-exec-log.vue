@@ -9,7 +9,9 @@
 import {
   getExecLog
 } from '@/api/routers'
+import expandRow from './table-expand.vue'
 export default {
+  components: { expandRow },
   data () {
     return {
       loading: false,
@@ -17,33 +19,54 @@ export default {
       current: 1,
       columns1: [
         {
+          type: 'expand',
+          width: 50,
+          render: (h, params) => {
+            console.log(params)
+            return h(expandRow, {
+              props: {
+                row: params.row
+              }
+            })
+          }
+        },
+        {
           title: '操作人',
-          key: 'operator'
+          key: 'operator',
+          width: 90
         },
         {
-          title: '脚本执行结束时间',
-          key: 'exec_date'
+          title: '结束时间',
+          key: 'exec_date',
+          width: 190
         },
+        // {
+        //   title: '名称',
+        //   key: 'script_name',
+        //   width:80
+        // },
         {
-          title: '脚本名称',
-          key: 'script_name'
+          title: '开始时间',
+          key: 'start_date',
+          width: 190
         },
+        // {
+        //   title: '输入用户',
+        //   key: 'username'
+        // },
         {
-          title: '脚本执行开始时间',
-          key: 'start_date'
+          title: '返回',
+          key: 'exec_code',
+          width: 60
         },
-        {
-          title: '服务器用户名',
-          key: 'username'
-        },
-        {
-          title: '脚本执行返回码',
-          key: 'exec_code'
-        },
-        {
-          title: '脚本执行参数',
-          key: 'options'
-        },
+        // {
+        //   title: '执行参数',
+        //   key: 'options'
+        // },
+        // {
+        //   title: 'ip',
+        //   key: 'ip_param',
+        // }
         {
           title: '标准输出',
           key: 'stdout'
