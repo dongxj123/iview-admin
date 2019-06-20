@@ -7,7 +7,7 @@
     <div>
         <Row class="expand-row">
             <Col span="8">
-                <span class="expand-key">名称: </span>
+                <span class="expand-key">脚本: </span>
                 <span class="expand-value">{{ row.script_name }}</span>
             </Col>
             <Col span="8">

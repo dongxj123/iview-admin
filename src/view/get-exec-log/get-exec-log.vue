@@ -22,7 +22,6 @@ export default {
           type: 'expand',
           width: 50,
           render: (h, params) => {
-            console.log(params)
             return h(expandRow, {
               props: {
                 row: params.row
@@ -36,20 +35,31 @@ export default {
           width: 90
         },
         {
+          title: '开始时间',
+          key: 'start_date',
+          width: 190
+        },
+        {
           title: '结束时间',
           key: 'exec_date',
           width: 190
+        },
+        {
+          title: '菜单名称',
+          key: 'menu_name',
+          width: 100
+        },
+        {
+          title: '按钮名称',
+          key: 'btn_name',
+          width: 100
         },
         // {
         //   title: '名称',
         //   key: 'script_name',
         //   width:80
         // },
-        {
-          title: '开始时间',
-          key: 'start_date',
-          width: 190
-        },
+
         // {
         //   title: '输入用户',
         //   key: 'username'
