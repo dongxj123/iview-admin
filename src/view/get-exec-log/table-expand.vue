@@ -22,7 +22,7 @@
         <Row>
             <Col span="24">
                 <span class="expand-key">ip: </span>
-                <span class="expand-value">{{ row.ip_param }}</span>
+                <span class="expand-value" style="word-wrap:break-word;">{{ row.ip_param }}</span>
             </Col>
         </Row>
     </div>

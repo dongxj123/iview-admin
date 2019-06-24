@@ -79,7 +79,8 @@ export default {
         // }
         {
           title: '标准输出',
-          key: 'stdout'
+          key: 'stdout',
+          width: 275
         }
       ],
       totalNum: 0,
