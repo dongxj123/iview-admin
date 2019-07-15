@@ -3,8 +3,9 @@
         <Table size="small" :loading="loading" border ref="selection" :columns="columns4" :data="data1" @on-selection-change="onSelectionChange"></Table>
         <Button @click="handleSelectAll(true)" style="margin-top:9px;">全选</Button>
         <Button @click="handleSelectAll(false)" style="margin-left:9px;margin-top:9px;">取消全选</Button>
-        <Dropdown @on-click="editButton($event,item)" class="button-distance" trigger="contextMenu" v-for="(item,index) in buttonList" :key="index">
-            <Button style="width:150px;" :type="item.have_sms_auth==0?'success':'error'" @click="confirm(item)">
+        <Button type="info" @click="confirm_original" style="width:150px;margin-left:9px;margin-top:9px;" :disabled="disabled">{{buttonName}}</Button>
+        <Dropdown @on-click="editButton($event,item)"  class="button-distance" trigger="contextMenu" v-for="(item,index) in buttonList" :key="index">
+            <Button style="width:150px;margin-left:9px;margin-top:9px;" :type="item.have_sms_auth==0?'success':'error'" @click="confirm(item)">
                 {{item.name}}
             </Button>
             <DropdownMenu slot="list" v-show="username.is_superuser">
@@ -12,8 +13,8 @@
                 <DropdownItem name="deleteBtn" style="color: #ed4014">删除</DropdownItem>
             </DropdownMenu>
         </Dropdown>
-        <Button class="add-btn" v-show="username.is_superuser" type="primary" @click="openAdd('add')">添加按钮</Button>
-        <!-- <Button type="info" @click="confirm" style="margin-left:9px;margin-top:9px;" :disabled="disabled">{{buttonName}}</Button> -->
+        <Button class="add-btn" style="margin-left:9px;margin-top:9px;" v-show="username.is_superuser" type="primary" @click="openAdd('add')">添加按钮</Button>
+
         <Modal
         v-model="modal3"
         title="容灾按钮操作"
@@ -301,6 +302,24 @@ export default {
         this.$Message.warning('请先选择操作项')
       }
     },
+    confirm_original () {
+      if (this.selectedIP.length) {
+        this.curentBtn = {
+          'have_password_auth': this.menuData.have_password_auth,
+          'have_sms_auth': this.menuData.have_sms_auth,
+          'id': 0,
+          'menu_id': this.menuData.id,
+          'name': this.menuData.name,
+          'order_num': this.menuData.order_num,
+          'script': this.menuData.script,
+          'static_param': this.menuData.static_param
+        }
+        // button_id > 0 表示执行额外按钮 ，button_id = 0 表示执行原始按钮
+        this.modal1 = true
+      } else {
+        this.$Message.warning('请先选择操作项')
+      }
+    },
     operateServer () {
       var operateServerParam = {
         'selected_servers': this.selectedIP,
@@ -449,11 +468,11 @@ export default {
 .ivu-table-small td {
     height: 30px;
 }
-.button-distance{
+/* .button-distance{
     margin: 10px;
 }
 .add-btn{
     position: absolute;
     margin: 10px;
-}
+} */
 </style>
