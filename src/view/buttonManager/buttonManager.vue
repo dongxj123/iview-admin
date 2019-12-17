@@ -13,6 +13,7 @@
         <Modal
         v-model="modal1"
         title="菜单操作"
+         :mask-closable="false"
         >
             <Form ref="formArg" :model="formArg" :rules="ruleformArg" :label-width="120">
                 <FormItem label="菜单名称：" prop="name">

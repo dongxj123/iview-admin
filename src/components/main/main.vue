@@ -243,3 +243,9 @@ export default {
   }
 }
 </script>
+
+<style lang="less">
+.ivu-menu-vertical .ivu-menu-item{
+    padding: 4px 24px !important;
+}
+</style>

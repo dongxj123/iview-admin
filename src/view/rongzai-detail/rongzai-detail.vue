@@ -14,6 +14,7 @@
         <Modal
         v-model="modal1"
         title="容灾按钮操作"
+         :mask-closable="false"
         >
         <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="90">
             <FormItem label="按钮名称：" prop="name">
@@ -27,6 +28,7 @@
             <FormItem label="验证选项：">
                 <Checkbox v-model="formValidate.have_sms_auth">短信验证</Checkbox>
                 <Checkbox v-model="formValidate.have_password_auth">用户密码验证</Checkbox>
+                <Checkbox v-model="formValidate.have_ip_param_item">工单信息</Checkbox>
             </FormItem>
             <FormItem label="脚本参数：" prop="static_param">
                 <Input v-model="formValidate.static_param" type="textarea" placeholder="请输入脚本参数（非必填）" />
@@ -44,6 +46,7 @@
     <Modal
         v-model="modal2"
         title="脚本执行完成"
+         :mask-closable="false"
         >
         <p>脚本名称：{{executeResult.script_name}}</p>
         <p>脚本执行开始时间：{{executeResult.start_date}}</p>
@@ -62,6 +65,8 @@
     <Modal
         v-model="modal3"
         title="确认执行脚本？"
+        :mask-closable="false"
+        :width=900
         >
         <Form ref="formArg" :model="formArg" :rules="ruleformArg" :label-width="90">
             <FormItem label="按钮名称：" style="margin-bottom:10px;">
@@ -72,6 +77,9 @@
             </FormItem>
             <FormItem label="密码：" prop="pwd" v-if="curentBtn.have_password_auth==1">
                 <Input v-model="formArg.pwd" :type="inputType" @on-focus="typeToPassWord" placeholder="请输入密码：..."></Input>
+            </FormItem>
+            <FormItem label="工单信息" prop="ips" v-if="curentBtn.have_ip_param_item==1">
+                <Input v-model="formArg.ips" type="textarea" :rows="4" placeholder="请输入工单信息" />
             </FormItem>
             <FormItem label="验证码：" prop="verifyCode" v-if="curentBtn.have_sms_auth==1">
                 <Input v-model="formArg.verifyCode" placeholder="请输入验证码：..."></Input>
@@ -112,6 +120,7 @@ export default {
         static_param: '',
         have_password_auth: false,
         have_sms_auth: false,
+        have_ip_param_item: false,
         order_num: ''
       },
       name_sm: '发送验证码',
@@ -119,7 +128,8 @@ export default {
       formArg: {
         username: '',
         pwd: '',
-        verifyCode: ''
+        verifyCode: '',
+        ips: ''
       },
       disabled_add: false,
       buttonList: [],
@@ -148,6 +158,9 @@ export default {
         ],
         verifyCode: [
           { required: true, message: '验证码不能为空', trigger: 'blur' }
+        ],
+        ips: [
+          { required: true, message: '验证码不能为空', trigger: 'blur' }
         ]
       },
       executeResult: {}
@@ -163,6 +176,7 @@ export default {
       if (fun === 'add') {
         this.formValidate.have_password_auth = false
         this.formValidate.have_sms_auth = false
+        this.formValidate.have_ip_param_item = false
         this.submitName = '添加'
         this.modal1 = true
       }
@@ -177,6 +191,7 @@ export default {
           static_param: item.static_param,
           have_password_auth: !!item.have_password_auth,
           have_sms_auth: !!item.have_sms_auth,
+          have_ip_param_item: !!item.have_ip_param_item,
           order_num: item.order_num
         }
         // this.have_password_auth=item.have_password_auth?true:false;
@@ -204,11 +219,12 @@ export default {
       }
     },
     ok () {
-      if (!this.curentBtn.have_password_auth && !this.curentBtn.have_sms_auth) {
+      if (!this.curentBtn.have_password_auth && !this.curentBtn.have_sms_auth && !this.curentBtn.have_ip_param_item) {
         var executeButtonParam = {
           'button_id': this.curentBtn.id,
           'username': this.formArg.username,
           'password': this.formArg.pwd,
+          'ips': this.formArg.ips,
           'sms_key': '1234',
           'sms_code': '5678'
         }
@@ -230,6 +246,7 @@ export default {
               'button_id': this.curentBtn.id,
               'username': this.formArg.username,
               'password': this.formArg.pwd,
+              'ips': this.formArg.ips,
               'sms_key': '1234',
               'sms_code': '5678'
             }
@@ -262,6 +279,7 @@ export default {
             var addButtonParam = Object.assign({}, this.formValidate)
             addButtonParam.have_password_auth = this.formValidate.have_password_auth ? 1 : 0
             addButtonParam.have_sms_auth = this.formValidate.have_sms_auth ? 1 : 0
+            addButtonParam.have_ip_param_item = this.formValidate.have_ip_param_item ? 1 : 0
             addButtonParam.menu_id = this.$route.query.id
             addButton(addButtonParam).then(res => {
               if (res.data.code === 0) {
@@ -279,6 +297,7 @@ export default {
             var editButtonParam = Object.assign({}, this.formValidate)
             editButtonParam.have_password_auth = editButtonParam.have_password_auth ? 1 : 0
             editButtonParam.have_sms_auth = editButtonParam.have_sms_auth ? 1 : 0
+            editButtonParam.have_ip_param_item = this.formValidate.have_ip_param_item ? 1 : 0
             editButtonParam.id = this.editID
             editButton(editButtonParam).then(res => {
               if (res.data.code === 0) {
